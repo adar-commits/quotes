@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>הצעת מחיר | השטיח שלי</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy: #2c3e50;
+      --gold: #d4af37;
+      --gold-dark: #b8962e;
+      --glass: rgba(255, 255, 255, 0.75);
+      --glass-border: rgba(255, 255, 255, 0.4);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Noto Sans Hebrew", sans-serif;
+      color: var(--navy);
+      background: url("https://images.unsplash.com/photo-1600166898405-da9535204843?w=1920&q=80") center/cover fixed no-repeat;
+      padding: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 56rem;
+      background: var(--glass);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 1rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+      border: 1px solid var(--glass-border);
+      overflow: hidden;
+    }
+
+    /* ----- Top banner ----- */
+    .banner {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-height: 12rem;
+      object-fit: cover;
+      border-bottom: 3px solid var(--gold);
+    }
+
+    /* ----- Customer info ----- */
+    .customer-section {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      padding: 1.5rem 1.75rem;
+      border-bottom: 1px solid rgba(44, 62, 80, 0.08);
+    }
+
+    .customer-avatar {
+      width: 4rem;
+      height: 4rem;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--gold);
+      flex-shrink: 0;
+    }
+
+    .customer-details h2 {
+      margin: 0 0 0.35rem 0;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    .customer-details p {
+      margin: 0.25rem 0 0 0;
+      font-size: 0.9rem;
+      color: var(--navy);
+      opacity: 0.85;
+    }
+
+    .customer-details .order-num {
+      font-weight: 600;
+      color: var(--gold-dark);
+    }
+
+    /* ----- Product card ----- */
+    .product-card {
+      display: flex;
+      gap: 1.5rem;
+      padding: 1.5rem 1.75rem;
+      border-bottom: 1px solid rgba(44, 62, 80, 0.08);
+      align-items: flex-start;
+    }
+
+    .product-card img {
+      width: 10rem;
+      min-width: 10rem;
+      height: 12rem;
+      object-fit: cover;
+      border-radius: 0.5rem;
+      border: 1px solid rgba(44, 62, 80, 0.12);
+    }
+
+    .product-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .product-info h3 {
+      margin: 0 0 0.75rem 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--navy);
+    }
+
+    .product-info ul {
+      margin: 0 0 1rem 0;
+      padding: 0 0 0 1.25rem;
+      font-size: 0.9rem;
+      color: var(--navy);
+      opacity: 0.9;
+      line-height: 1.6;
+    }
+
+    .product-info .price {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--gold-dark);
+    }
+
+    /* ----- Action area ----- */
+    .actions {
+      padding: 1.25rem 1.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      justify-content: flex-end;
+    }
+
+    .actions.hidden {
+      display: none;
+    }
+
+    .success-msg {
+      display: none;
+      padding: 1rem 1.5rem;
+      margin: 0 1.75rem 1.25rem;
+      background: rgba(34, 197, 94, 0.15);
+      color: #15803d;
+      font-weight: 600;
+      border-radius: 0.5rem;
+      border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+
+    .success-msg.visible {
+      display: block;
+    }
+
+    .btn {
+      font-family: "Noto Sans Hebrew", sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      padding: 0.6rem 1.25rem;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-print {
+      background: var(--navy);
+      color: white;
+    }
+
+    .btn-print:hover {
+      box-shadow: 0 4px 12px rgba(44, 62, 80, 0.35);
+    }
+
+    .btn-approve {
+      background: var(--gold);
+      color: var(--navy);
+    }
+
+    .btn-approve:hover {
+      background: var(--gold-dark);
+      color: white;
+      box-shadow: 0 4px 12px rgba(212, 175, 55, 0.4);
+    }
+
+    /* ----- Skeleton loader ----- */
+    .skeleton-wrapper {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: url("https://images.unsplash.com/photo-1600166898405-da9535204843?w=1920&q=80") center/cover fixed no-repeat;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      transition: opacity 0.5s ease-out;
+    }
+
+    .skeleton-wrapper.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .skeleton-container {
+      width: 100%;
+      max-width: 56rem;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 1rem;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+    }
+
+    .skeleton-banner {
+      height: 10rem;
+      background: linear-gradient(
+        90deg,
+        #e5e7eb 25%,
+        #f3f4f6 50%,
+        #e5e7eb 75%
+      );
+      background-size: 200% 100%;
+      animation: shimmer 1.5s ease-in-out infinite;
+    }
+
+    .skeleton-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.5rem 1.75rem;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+
+    .skeleton-avatar {
+      width: 4rem;
+      height: 4rem;
+      border-radius: 50%;
+      background: linear-gradient(
+        90deg,
+        #e5e7eb 25%,
+        #f3f4f6 50%,
+        #e5e7eb 75%
+      );
+      background-size: 200% 100%;
+      animation: shimmer 1.5s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+
+    .skeleton-lines {
+      flex: 1;
+    }
+
+    .skeleton-line {
+      height: 0.875rem;
+      border-radius: 0.25rem;
+      background: linear-gradient(
+        90deg,
+        #e5e7eb 25%,
+        #f3f4f6 50%,
+        #e5e7eb 75%
+      );
+      background-size: 200% 100%;
+      animation: shimmer 1.5s ease-in-out infinite;
+      margin-bottom: 0.5rem;
+    }
+
+    .skeleton-line.short { width: 40%; }
+    .skeleton-line.medium { width: 65%; }
+    .skeleton-line.long { width: 85%; }
+
+    .skeleton-card {
+      display: flex;
+      gap: 1.5rem;
+      padding: 1.5rem 1.75rem;
+    }
+
+    .skeleton-image {
+      width: 10rem;
+      min-width: 10rem;
+      height: 12rem;
+      border-radius: 0.5rem;
+      background: linear-gradient(
+        90deg,
+        #e5e7eb 25%,
+        #f3f4f6 50%,
+        #e5e7eb 75%
+      );
+      background-size: 200% 100%;
+      animation: shimmer 1.5s ease-in-out infinite;
+    }
+
+    .skeleton-card-lines {
+      flex: 1;
+    }
+
+    .skeleton-card-lines .skeleton-line { margin-bottom: 0.6rem; }
+    .skeleton-card-lines .skeleton-line:last-child { width: 30%; margin-top: 1rem; }
+
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    /* ----- Content fade-in ----- */
+    .invoice-content {
+      opacity: 0;
+      transition: opacity 0.5s ease-in;
+    }
+
+    .invoice-content.visible {
+      opacity: 1;
+    }
+
+    /* ----- Print ----- */
+    @media print {
+      body {
+        background: #fff !important;
+        padding: 0 !important;
+      }
+
+      .container {
+        background: #fff !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        box-shadow: none !important;
+        border: 1px solid #e5e7eb !important;
+        max-width: 100% !important;
+      }
+
+      .actions,
+      .actions.hidden,
+      .skeleton-wrapper,
+      .btn {
+        display: none !important;
+      }
+
+      .success-msg,
+      .success-msg.visible {
+        display: none !important;
+      }
+
+      .invoice-content {
+        opacity: 1 !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="skeleton-wrapper" id="skeleton" aria-hidden="false">
+    <div class="skeleton-container">
+      <div class="skeleton-banner"></div>
+      <div class="skeleton-row">
+        <div class="skeleton-avatar"></div>
+        <div class="skeleton-lines">
+          <div class="skeleton-line long"></div>
+          <div class="skeleton-line medium"></div>
+          <div class="skeleton-line short"></div>
+        </div>
+      </div>
+      <div class="skeleton-card">
+        <div class="skeleton-image"></div>
+        <div class="skeleton-card-lines">
+          <div class="skeleton-line long"></div>
+          <div class="skeleton-line medium"></div>
+          <div class="skeleton-line long"></div>
+          <div class="skeleton-line short"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="invoice-content" id="invoice" aria-hidden="true">
+    <div class="container">
+      <img
+        class="banner"
+        src="https://quotes.carpetshop.co.il/img/invoice_header.jpg"
+        alt=""
+      />
+      <section class="customer-section" aria-label="פרטי לקוח">
+        <img
+          class="customer-avatar"
+          id="avatar"
+          src=""
+          alt=""
+        />
+        <div class="customer-details">
+          <h2 id="customer-name">שם הלקוח</h2>
+          <p>תאריך: <span id="invoice-date">01.02.2026</span></p>
+          <p>מס׳ הזמנה: <span class="order-num" id="order-num">#OP-12345</span></p>
+        </div>
+      </section>
+      <section class="product-card" aria-label="מוצר">
+        <img
+          src="https://images.unsplash.com/photo-1600166898405-da9535204843?w=400&q=80"
+          alt="שטיח"
+        />
+        <div class="product-info">
+          <h3>שטיח קאבול צבעוני – מידה L</h3>
+          <ul>
+            <li>מידות: 248×170 ס״מ</li>
+            <li>חומר: צמר איכותי</li>
+            <li>צפיפות קשרים: גבוהה</li>
+            <li>טכניקת אריגה: ידנית</li>
+          </ul>
+          <p class="price">₪ 2,070.34</p>
+        </div>
+      </section>
+      <div class="success-msg" id="success-msg">ההצעה אושרה בהצלחה ✓</div>
+      <div class="actions" id="actions">
+        <button type="button" class="btn btn-print" id="btn-print">הדפסה</button>
+        <button type="button" class="btn btn-approve" id="btn-approve">אישור</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var CUSTOMER_NAME = "ישראל ישראלי";
+      var INVOICE_DATE = "25.02.2026";
+      var ORDER_NUM = "OP-24430104";
+
+      function initAvatar() {
+        var name = CUSTOMER_NAME || "לקוח";
+        var encoded = encodeURIComponent(name.replace(/\s+/g, " ").trim());
+        var url = "https://api.dicebear.com/7.x/initials/svg?seed=" + encoded + "&backgroundColor=2c3e50&textColor=d4af37";
+        var img = document.getElementById("avatar");
+        if (img) {
+          img.src = url;
+          img.alt = "תמונת פרופיל של " + name;
+        }
+      }
+
+      function fillPlaceholders() {
+        var el;
+        if (el = document.getElementById("customer-name")) el.textContent = CUSTOMER_NAME;
+        if (el = document.getElementById("invoice-date")) el.textContent = INVOICE_DATE;
+        if (el = document.getElementById("order-num")) el.textContent = "#" + ORDER_NUM;
+      }
+
+      function showInvoice() {
+        var skeleton = document.getElementById("skeleton");
+        var invoice = document.getElementById("invoice");
+        if (skeleton) {
+          skeleton.classList.add("hidden");
+          skeleton.setAttribute("aria-hidden", "true");
+        }
+        if (invoice) {
+          invoice.classList.add("visible");
+          invoice.setAttribute("aria-hidden", "false");
+        }
+      }
+
+      function onApprove() {
+        var actions = document.getElementById("actions");
+        var successMsg = document.getElementById("success-msg");
+        if (actions) actions.classList.add("hidden");
+        if (successMsg) successMsg.classList.add("visible");
+      }
+
+      function onPrint() {
+        window.print();
+      }
+
+      fillPlaceholders();
+      initAvatar();
+
+      setTimeout(showInvoice, 2000);
+
+      var btnPrint = document.getElementById("btn-print");
+      var btnApprove = document.getElementById("btn-approve");
+      if (btnPrint) btnPrint.addEventListener("click", onPrint);
+      if (btnApprove) btnApprove.addEventListener("click", onApprove);
+    })();
+  </script>
+</body>
+</html>
