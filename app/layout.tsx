@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import LineLoader from "./LineLoader";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -17,11 +18,14 @@ export const metadata: Metadata = {
   description: "Quotes app",
 };
 
+const THEME_RED = "#801a1e";
+
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
   viewportFit: "cover",
+  themeColor: THEME_RED,
 };
 
 export default function RootLayout({
@@ -34,6 +38,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <LineLoader />
         {children}
       </body>
     </html>

@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "www.carpetshop.co.il", pathname: "/**" },
+      { protocol: "https", hostname: "quotes.carpetshop.co.il", pathname: "/**" },
       { protocol: "https", hostname: "app.fireberry.com", pathname: "/**" },
     ],
   },

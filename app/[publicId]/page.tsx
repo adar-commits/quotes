@@ -32,6 +32,24 @@ function shortenId(id: string | null): string {
   return id.length > 12 ? `${id.slice(0, 8)}…` : id;
 }
 
+/** 5–7 product attribute labels + values (fictive when missing). */
+function getProductAttributes(p: {
+  color?: string | null;
+  shape?: string | null;
+  material?: string | null;
+  technique?: string | null;
+}) {
+  return [
+    { label: "צבע", value: p.color ?? "שנהב" },
+    { label: "צורה", value: p.shape ?? "מלבן" },
+    { label: "חומר", value: p.material ?? "כותנה" },
+    { label: "טכניקת אריגה", value: p.technique ?? "אריגה" },
+    { label: "גודל", value: "170×120 ס״מ" },
+    { label: "משקל", value: "2.5 ק״ג" },
+    { label: "מוצא", value: "ישראל" },
+  ];
+}
+
 export default async function QuotePage({
   params,
 }: {
@@ -55,9 +73,17 @@ export default async function QuotePage({
   return (
     <QuoteReveal>
       {/* Carpet-style background + frosted glass container */}
-      <div className="min-h-screen antialiased" dir="rtl" style={{ background: "linear-gradient(135deg, #fef3c7 0%, #fce7f3 35%, #e7e5e4 70%, #d6d3d1 100%)" }}>
+      <div className="min-h-screen antialiased" dir="rtl">
+        {/* Carpet-oriented background with slight blur layer */}
+        <div
+          className="fixed inset-0 -z-10 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: "url(https://images.unsplash.com/photo-1600166898405-da9535204843?w=1920)",
+          }}
+        />
+        <div className="fixed inset-0 -z-10 bg-gradient-to-br from-amber-100/85 via-rose-50/80 to-stone-200/85 backdrop-blur-[2px]" aria-hidden />
         <div className="mx-auto max-w-5xl p-4 py-6 md:p-8 md:py-8">
-          <div className="overflow-hidden rounded-2xl border border-white/30 bg-white/80 shadow-2xl backdrop-blur-xl">
+          <div className="overflow-hidden rounded-2xl border border-white/30 bg-white/85 shadow-2xl backdrop-blur-xl">
             {/* Section 1: Top banner + 3-column info header */}
             <div className="border-b border-gray-100/80">
               <QuoteBanner />
@@ -122,7 +148,6 @@ export default async function QuotePage({
               {products.map((p, i) => {
                 const lineTotal =
                   p.qty * (Number(p.unit_price) - Number(p.unit_discount));
-                const hasTraits = p.color || p.shape || p.material || p.technique;
                 return (
                   <li
                     key={i}
@@ -147,14 +172,11 @@ export default async function QuotePage({
                         <p className="mt-0.5 font-medium text-slate-800">
                           {p.product_desc ?? "—"}
                         </p>
-                        {hasTraits && (
-                          <div className="mt-2 flex flex-wrap justify-end gap-x-2 gap-y-0.5 text-xs text-gray-600">
-                            {p.color && <span>צבע: {p.color}</span>}
-                            {p.shape && <span>צורה: {p.shape}</span>}
-                            {p.material && <span>חומר: {p.material}</span>}
-                            {p.technique && <span>טכניקה: {p.technique}</span>}
+                        <div className="mt-2 flex flex-wrap justify-end gap-x-2 gap-y-0.5 text-xs text-gray-600">
+                            {getProductAttributes(p).map(({ label, value }) => (
+                              <span key={label}>{label}: {value}</span>
+                            ))}
                           </div>
-                        )}
                         <div className="mt-2 flex flex-wrap justify-end gap-x-4 gap-y-1 text-sm">
                           <span>כמות: {p.qty}</span>
                           <span>{formatCurrency(Number(p.unit_price))} ליח׳</span>
@@ -222,14 +244,11 @@ export default async function QuotePage({
                               <p className="font-medium text-slate-800">
                                 {p.product_desc ?? "—"}
                               </p>
-                              {(p.color || p.shape || p.material || p.technique) && (
-                                <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-gray-600">
-                                  {p.color && <span>צבע: {p.color}</span>}
-                                  {p.shape && <span>צורה: {p.shape}</span>}
-                                  {p.material && <span>חומר: {p.material}</span>}
-                                  {p.technique && <span>טכניקה: {p.technique}</span>}
+                              <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-gray-600">
+                                  {getProductAttributes(p).map(({ label, value }) => (
+                                    <span key={label}>{label}: {value}</span>
+                                  ))}
                                 </div>
-                              )}
                             </div>
                           </div>
                         </td>
@@ -248,23 +267,23 @@ export default async function QuotePage({
             </div>
           </section>
 
-          {/* Section 3: Financial summary footer — full-width brand bar */}
+          {/* Section 3: Financial summary footer — full-width brand bar, aligned left */}
           <div
-            className="flex flex-col gap-6 rounded-b-xl px-4 py-6 text-white sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-4 md:px-8"
+            className="flex flex-col gap-6 rounded-b-xl px-4 py-6 text-white sm:flex-row sm:flex-wrap sm:items-center sm:justify-start sm:gap-4 md:px-8"
             style={{ backgroundColor: BRAND_RED }}
           >
-            <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:gap-8 md:gap-12">
-              <div>
+            <div className="flex flex-col gap-4 text-left sm:flex-row sm:flex-wrap sm:gap-8 md:gap-12">
+              <div className="text-left">
                 <p className="text-sm opacity-90">סה&quot;כ ללא מע&quot;מ</p>
-                <p className="text-base font-semibold sm:text-lg">{formatCurrency(subtotal)}</p>
+                <p className="text-base font-semibold sm:text-lg" dir="ltr">{formatCurrency(subtotal)}</p>
               </div>
-              <div>
+              <div className="text-left">
                 <p className="text-sm opacity-90">מע&quot;מ ({quote.vat}%)</p>
-                <p className="text-base font-semibold sm:text-lg">{formatCurrency(vatAmount)}</p>
+                <p className="text-base font-semibold sm:text-lg" dir="ltr">{formatCurrency(vatAmount)}</p>
               </div>
-              <div>
+              <div className="text-left">
                 <p className="text-sm opacity-90">סה&quot;כ לתשלום</p>
-                <p className="text-lg font-bold sm:text-xl">{formatCurrency(total)}</p>
+                <p className="text-lg font-bold sm:text-xl" dir="ltr">{formatCurrency(total)}</p>
               </div>
             </div>
           </div>

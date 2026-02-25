@@ -15,7 +15,7 @@ export default function QuoteBanner() {
       />
       {!imgError && (
         <Image
-          src="/invoice_header.jpg"
+          src="https://quotes.carpetshop.co.il/img/invoice_header.jpg"
           alt=""
           fill
           className="object-cover"
