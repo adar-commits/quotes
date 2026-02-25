@@ -36,32 +36,92 @@ export async function POST(request: NextRequest) {
   }
 
   const supabase = createServiceRoleClient();
+  const quotationId = (q.quotationID ?? "").trim();
 
-  const { data: quoteRow, error: quoteError } = await supabase
-    .from("quotes")
-    .insert({
-      vat: q.vat,
-      invoice_id: q.invoiceID ?? null,
-      project_name: q.projectName ?? null,
-      quotation_id: q.quotationID ?? null,
-      special_discount: q.specialDiscount ?? 0,
-      require_signature: q.requireSignature ?? true,
-      invoice_creation_date: parseInvoiceDate(q.invoiceCreationDate ?? ""),
-      agent_code: q.agentCode ?? null,
-      agent_desc: q.agentDesc ?? null,
-    })
-    .select("id, public_id")
-    .single();
+  // If quotation_id (e.g. OP-xxx) is sent and exists, update that quote instead of creating
+  let quoteId: string;
+  let publicId: string;
 
-  if (quoteError || !quoteRow) {
-    return NextResponse.json(
-      { error: quoteError?.message ?? "Failed to create quote" },
-      { status: 500 }
-    );
+  if (quotationId) {
+    const { data: existing } = await supabase
+      .from("quotes")
+      .select("id, public_id")
+      .eq("quotation_id", quotationId)
+      .maybeSingle();
+
+    if (existing) {
+      quoteId = existing.id;
+      publicId = existing.public_id;
+
+      await supabase.from("quotes").update({
+        vat: q.vat,
+        invoice_id: q.invoiceID ?? null,
+        project_name: q.projectName ?? null,
+        quotation_id: quotationId,
+        special_discount: q.specialDiscount ?? 0,
+        require_signature: q.requireSignature ?? true,
+        invoice_creation_date: parseInvoiceDate(q.invoiceCreationDate ?? ""),
+        agent_code: q.agentCode ?? null,
+        agent_desc: q.agentDesc ?? null,
+        updated_at: new Date().toISOString(),
+      }).eq("id", quoteId);
+
+      await supabase.from("quote_customers").delete().eq("quote_id", quoteId);
+      await supabase.from("quote_representatives").delete().eq("quote_id", quoteId);
+      await supabase.from("quote_products").delete().eq("quote_id", quoteId);
+      await supabase.from("quote_payment_terms").delete().eq("quote_id", quoteId);
+    } else {
+      const { data: quoteRow, error: quoteError } = await supabase
+        .from("quotes")
+        .insert({
+          vat: q.vat,
+          invoice_id: q.invoiceID ?? null,
+          project_name: q.projectName ?? null,
+          quotation_id: quotationId,
+          special_discount: q.specialDiscount ?? 0,
+          require_signature: q.requireSignature ?? true,
+          invoice_creation_date: parseInvoiceDate(q.invoiceCreationDate ?? ""),
+          agent_code: q.agentCode ?? null,
+          agent_desc: q.agentDesc ?? null,
+        })
+        .select("id, public_id")
+        .single();
+
+      if (quoteError || !quoteRow) {
+        return NextResponse.json(
+          { error: quoteError?.message ?? "Failed to create quote" },
+          { status: 500 }
+        );
+      }
+      quoteId = quoteRow.id;
+      publicId = quoteRow.public_id;
+    }
+  } else {
+    const { data: quoteRow, error: quoteError } = await supabase
+      .from("quotes")
+      .insert({
+        vat: q.vat,
+        invoice_id: q.invoiceID ?? null,
+        project_name: q.projectName ?? null,
+        quotation_id: null,
+        special_discount: q.specialDiscount ?? 0,
+        require_signature: q.requireSignature ?? true,
+        invoice_creation_date: parseInvoiceDate(q.invoiceCreationDate ?? ""),
+        agent_code: q.agentCode ?? null,
+        agent_desc: q.agentDesc ?? null,
+      })
+      .select("id, public_id")
+      .single();
+
+    if (quoteError || !quoteRow) {
+      return NextResponse.json(
+        { error: quoteError?.message ?? "Failed to create quote" },
+        { status: 500 }
+      );
+    }
+    quoteId = quoteRow.id;
+    publicId = quoteRow.public_id;
   }
-
-  const quoteId = quoteRow.id;
-  const publicId = quoteRow.public_id;
 
   const customer = q.customer;
   if (customer) {
