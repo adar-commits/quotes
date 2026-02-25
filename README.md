@@ -29,3 +29,14 @@ Open [http://localhost:3000](http://localhost:3000). Sign in at `/login`.
 npm run build
 npm start
 ```
+
+## GitHub (one-time)
+
+If you haven’t pushed yet: create a new repository named `quotes` on [github.com/new](https://github.com/new) (private or public), then run:
+
+```bash
+git remote add origin https://github.com/YOUR_USERNAME/quotes.git
+git push -u origin main
+```
+
+(Use your GitHub username; or use the SSH URL if you prefer.)
