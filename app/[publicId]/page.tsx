@@ -1,14 +1,11 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { Heebo } from "next/font/google";
 import { getQuoteByPublicId } from "@/lib/quotes-db";
 import QuoteSignature from "./QuoteSignature";
-
-const heebo = Heebo({
-  subsets: ["hebrew", "latin"],
-  display: "swap",
-});
+import QuoteReveal from "./QuoteReveal";
+import QuoteBanner from "./QuoteBanner";
+import DefaultAvatar from "./DefaultAvatar";
 
 const BRAND_RED = "#801a1e";
 
@@ -56,22 +53,20 @@ export default async function QuotePage({
   const total = afterDiscount + vatAmount;
 
   return (
-    <div
-      className={`min-h-screen bg-gray-50 antialiased ${heebo.className}`}
-      dir="rtl"
-    >
-      <div className="mx-auto max-w-5xl p-4 py-8 md:p-8">
-        {/* Main card: digital paper with glassmorphism feel */}
-        <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-2xl">
-          {/* Section 1: Hero banner + 3-column info header */}
-          <div className="border-b border-gray-100">
-            <div className="h-40 w-full bg-gradient-to-br from-gray-100 to-gray-200 md:h-52" />
-            <div className="grid grid-cols-1 gap-6 border-t border-gray-200 bg-white/95 p-6 backdrop-blur-sm md:grid-cols-3 md:p-8">
+    <QuoteReveal>
+      {/* Carpet-style background + frosted glass container */}
+      <div className="min-h-screen antialiased" dir="rtl" style={{ background: "linear-gradient(135deg, #fef3c7 0%, #fce7f3 35%, #e7e5e4 70%, #d6d3d1 100%)" }}>
+        <div className="mx-auto max-w-5xl p-4 py-6 md:p-8 md:py-8">
+          <div className="overflow-hidden rounded-2xl border border-white/30 bg-white/80 shadow-2xl backdrop-blur-xl">
+            {/* Section 1: Top banner + 3-column info header */}
+            <div className="border-b border-gray-100/80">
+              <QuoteBanner />
+            <div className="grid grid-cols-1 gap-6 border-t border-gray-200/80 bg-white/70 p-4 backdrop-blur-md sm:p-6 md:grid-cols-3 md:p-8">
               <div>
                 <p className="text-xs font-bold uppercase tracking-wider text-gray-500">
                   שם לקוח
                 </p>
-                <p className="mt-1 text-lg font-semibold text-slate-800">
+                <p className="mt-1 text-base font-semibold text-slate-800 sm:text-lg">
                   {customer?.customer_name ?? "—"}
                 </p>
               </div>
@@ -79,18 +74,18 @@ export default async function QuotePage({
                 <p className="text-xs font-bold uppercase tracking-wider text-gray-500">
                   מס׳ הצעה
                 </p>
-                <p className="text-slate-800">{shortenId(quote.invoice_id ?? quote.quotation_id)}</p>
-                <p className="text-xs font-bold uppercase tracking-wider text-gray-500 mt-2">
+                <p className="text-base text-slate-800 sm:text-lg">{shortenId(quote.invoice_id ?? quote.quotation_id)}</p>
+                <p className="mt-2 text-xs font-bold uppercase tracking-wider text-gray-500">
                   תאריך הפקה
                 </p>
                 <p className="text-slate-800">{formatDate(quote.invoice_creation_date)}</p>
-                <p className="text-xs font-bold uppercase tracking-wider text-gray-500 mt-2">
+                <p className="mt-2 text-xs font-bold uppercase tracking-wider text-gray-500">
                   שם הפרויקט
                 </p>
                 <p className="text-slate-800">{quote.project_name ?? "—"}</p>
               </div>
               <div className="flex items-center gap-4">
-                <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full border-2 border-gray-200 shadow-md">
+                <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full border-2 border-white/50 shadow-lg sm:h-24 sm:w-24">
                   {representative?.rep_avatar ? (
                     <Image
                       src={representative.rep_avatar}
@@ -99,9 +94,7 @@ export default async function QuotePage({
                       className="object-cover"
                     />
                   ) : (
-                    <div className="flex h-full w-full items-center justify-center bg-slate-200 text-2xl font-medium text-slate-600">
-                      {representative?.rep_full_name?.charAt(0) ?? "?"}
-                    </div>
+                    <DefaultAvatar />
                   )}
                 </div>
                 <div>
@@ -111,7 +104,8 @@ export default async function QuotePage({
                   {representative?.rep_phone && (
                     <a
                       href={`tel:${representative.rep_phone.replace(/\D/g, "")}`}
-                      className="mt-1 block text-sm text-gray-600 transition-colors hover:text-[#801a1e]"
+                      className="mt-1 block min-h-[44px] min-w-[44px] py-2 text-base text-gray-600 transition-colors hover:text-[#801a1e] sm:min-h-0 sm:min-w-0 sm:py-0 sm:text-sm"
+                      style={{ WebkitTapHighlightColor: 'transparent' }}
                     >
                       {representative.rep_phone}
                     </a>
@@ -121,9 +115,61 @@ export default async function QuotePage({
             </div>
           </div>
 
-          {/* Section 2: Products table — borderless sides, thick top/bottom */}
+          {/* Section 2: Products — cards on mobile, table from md up */}
           <section className="px-4 py-6 md:px-8">
-            <div className="overflow-x-auto">
+            {/* Mobile: card list with product image + characteristics */}
+            <ul className="space-y-4 md:hidden">
+              {products.map((p, i) => {
+                const lineTotal =
+                  p.qty * (Number(p.unit_price) - Number(p.unit_discount));
+                const hasTraits = p.color || p.shape || p.material || p.technique;
+                return (
+                  <li
+                    key={i}
+                    className="rounded-xl border border-gray-200/80 bg-white/60 p-4 shadow-sm backdrop-blur-sm"
+                  >
+                    <div className="flex gap-4">
+                      {p.picture_url ? (
+                        <div className="relative h-28 w-24 shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-gray-100">
+                          <Image
+                            src={p.picture_url}
+                            alt=""
+                            fill
+                            className="object-cover"
+                            sizes="96px"
+                          />
+                        </div>
+                      ) : (
+                        <div className="h-28 w-24 shrink-0 rounded-lg border border-gray-200 bg-gray-100" />
+                      )}
+                      <div className="min-w-0 flex-1 text-right">
+                        <p className="text-xs text-gray-500">{p.sku ?? "—"}</p>
+                        <p className="mt-0.5 font-medium text-slate-800">
+                          {p.product_desc ?? "—"}
+                        </p>
+                        {hasTraits && (
+                          <div className="mt-2 flex flex-wrap justify-end gap-x-2 gap-y-0.5 text-xs text-gray-600">
+                            {p.color && <span>צבע: {p.color}</span>}
+                            {p.shape && <span>צורה: {p.shape}</span>}
+                            {p.material && <span>חומר: {p.material}</span>}
+                            {p.technique && <span>טכניקה: {p.technique}</span>}
+                          </div>
+                        )}
+                        <div className="mt-2 flex flex-wrap justify-end gap-x-4 gap-y-1 text-sm">
+                          <span>כמות: {p.qty}</span>
+                          <span>{formatCurrency(Number(p.unit_price))} ליח׳</span>
+                          <span className="font-semibold text-slate-800">
+                            {formatCurrency(lineTotal)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+            {/* Desktop: table */}
+            <div className="hidden overflow-x-auto md:block">
               <table className="w-full min-w-[640px] border-collapse text-right">
                 <thead>
                   <tr className="border-y-2 border-gray-300 bg-gray-50/80">
@@ -158,21 +204,33 @@ export default async function QuotePage({
                           {p.sku ?? "—"}
                         </td>
                         <td className="py-4 px-3 align-top">
-                          <div className="flex flex-col gap-2">
-                            {p.picture_url && (
-                              <div className="relative h-40 w-32 overflow-hidden rounded-lg border border-gray-200 bg-gray-100 transition-transform hover:scale-105">
+                          <div className="flex gap-4">
+                            {p.picture_url ? (
+                              <div className="relative h-36 w-28 shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-gray-100 transition-transform hover:scale-[1.02]">
                                 <Image
                                   src={p.picture_url}
                                   alt=""
                                   fill
                                   className="object-cover"
-                                  sizes="128px"
+                                  sizes="112px"
                                 />
                               </div>
+                            ) : (
+                              <div className="h-36 w-28 shrink-0 rounded-lg border border-gray-200 bg-gray-100" />
                             )}
-                            <p className="font-medium text-slate-800">
-                              {p.product_desc ?? "—"}
-                            </p>
+                            <div className="min-w-0 flex-1">
+                              <p className="font-medium text-slate-800">
+                                {p.product_desc ?? "—"}
+                              </p>
+                              {(p.color || p.shape || p.material || p.technique) && (
+                                <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-gray-600">
+                                  {p.color && <span>צבע: {p.color}</span>}
+                                  {p.shape && <span>צורה: {p.shape}</span>}
+                                  {p.material && <span>חומר: {p.material}</span>}
+                                  {p.technique && <span>טכניקה: {p.technique}</span>}
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </td>
                         <td className="py-4 px-3 text-gray-700">{p.qty}</td>
@@ -192,35 +250,35 @@ export default async function QuotePage({
 
           {/* Section 3: Financial summary footer — full-width brand bar */}
           <div
-            className="flex flex-wrap items-center justify-between gap-4 rounded-b-xl px-6 py-6 text-white md:px-8"
+            className="flex flex-col gap-6 rounded-b-xl px-4 py-6 text-white sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-4 md:px-8"
             style={{ backgroundColor: BRAND_RED }}
           >
-            <div className="flex flex-wrap gap-8 md:gap-12">
+            <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:gap-8 md:gap-12">
               <div>
                 <p className="text-sm opacity-90">סה&quot;כ ללא מע&quot;מ</p>
-                <p className="text-lg font-semibold">{formatCurrency(subtotal)}</p>
+                <p className="text-base font-semibold sm:text-lg">{formatCurrency(subtotal)}</p>
               </div>
               <div>
                 <p className="text-sm opacity-90">מע&quot;מ ({quote.vat}%)</p>
-                <p className="text-lg font-semibold">{formatCurrency(vatAmount)}</p>
+                <p className="text-base font-semibold sm:text-lg">{formatCurrency(vatAmount)}</p>
               </div>
               <div>
                 <p className="text-sm opacity-90">סה&quot;כ לתשלום</p>
-                <p className="text-xl font-bold">{formatCurrency(total)}</p>
+                <p className="text-lg font-bold sm:text-xl">{formatCurrency(total)}</p>
               </div>
             </div>
           </div>
 
           {/* Section 4: Terms & conditions */}
-          <div className="border-t border-gray-100 p-6 md:p-8">
+          <div className="border-t border-gray-100 p-4 sm:p-6 md:p-8">
             <h3
-              className="mb-4 text-lg font-bold"
+              className="mb-4 text-base font-bold sm:text-lg"
               style={{ color: BRAND_RED }}
             >
               תנאי תשלום ומסחר
             </h3>
             {paymentTerms.length > 0 ? (
-              <ul className="space-y-2 text-sm text-gray-700">
+              <ul className="space-y-2 text-base text-gray-700 sm:text-sm">
                 {paymentTerms.map((t, i) => (
                   <li key={i} className="flex gap-2">
                     <span
@@ -238,22 +296,24 @@ export default async function QuotePage({
 
           {/* Section 5: Digital signature (interactive) */}
           {quote.require_signature && (
-            <div className="border-t border-gray-100 p-6 md:p-8">
+            <div className="border-t border-gray-100 p-4 sm:p-6 md:p-8">
               <QuoteSignature />
             </div>
           )}
         </div>
 
-        <footer className="mt-8 text-center text-sm text-gray-500">
+        <footer className="mt-6 text-center text-sm text-gray-500 md:mt-8">
           <p>כנרת 10, איירפורט סיטי</p>
           <Link
             href="/"
-            className="mt-1 inline-block text-gray-600 transition-colors hover:text-[#801a1e]"
+            className="mt-2 inline-flex min-h-[44px] min-w-[44px] items-center justify-center text-base text-gray-600 transition-colors hover:text-[#801a1e] sm:min-h-0 sm:min-w-0 sm:text-sm"
+            style={{ WebkitTapHighlightColor: 'transparent' }}
           >
             csquotes.vercel.app
           </Link>
         </footer>
       </div>
     </div>
+    </QuoteReveal>
   );
 }

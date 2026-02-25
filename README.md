@@ -18,6 +18,10 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000). Sign in at `/login`.
 
+## Quote page
+
+- Optional: add `invoice_header.jpg` to the `public/` folder to show a custom top banner on quotation pages. If missing, a gradient placeholder is shown.
+
 ## Supabase
 
 - Enable an Auth provider (e.g. Google) in Authentication → Providers.

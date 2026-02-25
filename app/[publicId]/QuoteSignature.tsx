@@ -8,11 +8,11 @@ export default function QuoteSignature() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   return (
-    <section className="rounded-2xl border border-gray-200 bg-white/80 p-6 shadow-lg backdrop-blur-sm md:p-8">
-      <h3 className="mb-6 text-center text-xl font-bold text-[#801a1e] md:text-2xl">
+    <section className="rounded-2xl border border-gray-200 bg-white/80 p-4 shadow-lg backdrop-blur-sm sm:p-6 md:p-8">
+      <h3 className="mb-4 text-center text-lg font-bold text-[#801a1e] sm:mb-6 sm:text-xl md:text-2xl">
         חתימה דיגיטלית על הצעת המחיר
       </h3>
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
         <div className="space-y-4">
           <div className="relative">
             <input
@@ -21,7 +21,8 @@ export default function QuoteSignature() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder=" "
-              className="peer w-full rounded-lg border border-gray-300 bg-gray-50/50 px-3 py-3 pt-5 text-right transition-colors focus:border-[#801a1e] focus:outline-none focus:ring-1 focus:ring-[#801a1e]"
+              className="peer min-h-[44px] w-full rounded-lg border border-gray-300 bg-gray-50/50 px-3 py-3 pt-5 text-base text-right transition-colors focus:border-[#801a1e] focus:outline-none focus:ring-1 focus:ring-[#801a1e]"
+              autoComplete="name"
             />
             <label
               htmlFor="sig-name"
@@ -37,7 +38,8 @@ export default function QuoteSignature() {
               value={role}
               onChange={(e) => setRole(e.target.value)}
               placeholder=" "
-              className="peer w-full rounded-lg border border-gray-300 bg-gray-50/50 px-3 py-3 pt-5 text-right transition-colors focus:border-[#801a1e] focus:outline-none focus:ring-1 focus:ring-[#801a1e]"
+              className="peer min-h-[44px] w-full rounded-lg border border-gray-300 bg-gray-50/50 px-3 py-3 pt-5 text-base text-right transition-colors focus:border-[#801a1e] focus:outline-none focus:ring-1 focus:ring-[#801a1e]"
+              autoComplete="organization-title"
             />
             <label
               htmlFor="sig-role"
@@ -48,12 +50,13 @@ export default function QuoteSignature() {
           </div>
         </div>
         <div>
-          <div className="relative h-48 w-full rounded-lg border-2 border-dashed border-gray-400 bg-gray-50">
+          <div className="relative h-40 w-full rounded-lg border-2 border-dashed border-gray-400 bg-gray-50 touch-none sm:h-48" style={{ touchAction: 'none' }}>
             <canvas
               ref={canvasRef}
               className="absolute inset-0 h-full w-full rounded-lg"
               width={400}
               height={192}
+              aria-label="אזור חתימה"
             />
           </div>
           <p className="mt-2 text-center text-sm text-gray-500">
@@ -63,7 +66,8 @@ export default function QuoteSignature() {
       </div>
       <button
         type="button"
-        className="mt-6 w-full rounded-xl bg-[#801a1e] px-6 py-4 text-lg font-semibold text-white shadow-lg transition-all hover:bg-[#6b1619] hover:shadow-xl active:scale-[0.99]"
+        className="mt-4 min-h-[48px] w-full rounded-xl bg-[#801a1e] px-6 py-4 text-base font-semibold text-white shadow-lg transition-all hover:bg-[#6b1619] hover:shadow-xl active:scale-[0.99] sm:mt-6 sm:text-lg"
+        style={{ WebkitTapHighlightColor: 'transparent' }}
       >
         שלח
       </button>
