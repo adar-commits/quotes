@@ -16,14 +16,14 @@ export default function ApprovalStatusSelect() {
   const [selected, setSelected] = useState<StatusValue | null>(null);
 
   return (
-    <div className="flex flex-col gap-1.5">
+    <div className="flex flex-col gap-2">
       <span
-        className="text-xs font-bold uppercase tracking-wider text-gray-500"
+        className="text-[0.7rem] font-bold uppercase tracking-widest text-slate-500"
         style={{ color: BRAND_RED }}
       >
         סטטוס אישור
       </span>
-      <div className="flex flex-wrap gap-1.5">
+      <div className="flex flex-wrap gap-2">
         {OPTIONS.map(({ value, label }) => {
           const isActive = selected === value;
           return (
@@ -31,11 +31,12 @@ export default function ApprovalStatusSelect() {
               key={value}
               type="button"
               onClick={() => setSelected(value)}
-              className="rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0"
+              className="rounded-xl border-2 px-3 py-2 text-xs font-semibold transition-all min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 hover:shadow-md active:scale-[0.98]"
               style={{
-                borderColor: isActive ? BRAND_RED : "rgb(209 213 219)",
-                backgroundColor: isActive ? BRAND_RED : "transparent",
-                color: isActive ? "white" : "rgb(55 65 81)",
+                borderColor: isActive ? BRAND_RED : "rgb(226 232 240)",
+                backgroundColor: isActive ? BRAND_RED : "rgb(248 250 252)",
+                color: isActive ? "white" : "rgb(51 65 85)",
+                boxShadow: isActive ? "0 2px 8px rgba(128, 26, 30, 0.25)" : "none",
               }}
             >
               {label}

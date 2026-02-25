@@ -8,6 +8,7 @@ import QuoteBanner from "./QuoteBanner";
 import DefaultAvatar from "./DefaultAvatar";
 import ApprovalStatusSelect from "./ApprovalStatusSelect";
 import ContactStrip from "./ContactStrip";
+import ProductAttributesList from "./ProductAttributesList";
 
 const BRAND_RED = "#801a1e";
 
@@ -85,35 +86,41 @@ export default async function QuotePage({
         />
         <div className="fixed inset-0 -z-10 bg-gradient-to-br from-amber-100/85 via-rose-50/80 to-stone-200/85 backdrop-blur-[2px]" aria-hidden />
         <div className="mx-auto max-w-5xl p-4 py-6 md:p-8 md:py-8">
-          <div className="overflow-hidden rounded-2xl border border-white/30 bg-white/85 shadow-2xl backdrop-blur-xl">
+          <div className="overflow-hidden rounded-3xl border border-white/40 bg-white/90 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] ring-1 ring-black/5 backdrop-blur-xl">
             {/* Page 1: Quotation numbers chart — banner + info + financial summary only */}
-            <div className="border-b border-gray-100/80">
+            <div className="border-b border-slate-200/60">
               <QuoteBanner />
-              <div className="grid grid-cols-1 gap-6 border-t border-gray-200/80 bg-white/70 p-4 backdrop-blur-md sm:p-6 md:grid-cols-3 md:p-8">
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-wider text-gray-500">
+              <div className="grid grid-cols-1 gap-6 border-t border-slate-200/80 bg-gradient-to-b from-slate-50/90 to-white p-4 backdrop-blur-sm sm:p-6 md:grid-cols-3 md:p-8">
+                <div className="rounded-2xl border border-slate-200/60 bg-white/80 p-4 shadow-sm ring-1 ring-slate-900/5 transition-shadow hover:shadow-md">
+                  <p className="text-[0.7rem] font-bold uppercase tracking-widest text-slate-400">
                     שם לקוח
                   </p>
-                  <p className="mt-1 text-base font-semibold text-slate-800 sm:text-lg">
+                  <p className="mt-2 text-base font-semibold text-slate-800 sm:text-lg">
                     {customer?.customer_name ?? "—"}
                   </p>
                 </div>
-                <div className="space-y-1">
-                  <p className="text-xs font-bold uppercase tracking-wider text-gray-500">
-                    מס׳ הצעה
-                  </p>
-                  <p className="text-base text-slate-800 sm:text-lg">{shortenId(quote.invoice_id ?? quote.quotation_id)}</p>
-                  <p className="mt-2 text-xs font-bold uppercase tracking-wider text-gray-500">
-                    תאריך הפקה
-                  </p>
-                  <p className="text-slate-800">{formatDate(quote.invoice_creation_date)}</p>
-                  <p className="mt-2 text-xs font-bold uppercase tracking-wider text-gray-500">
-                    שם הפרויקט
-                  </p>
-                  <p className="text-slate-800">{quote.project_name ?? "—"}</p>
+                <div className="space-y-3 rounded-2xl border border-slate-200/60 bg-white/80 p-4 shadow-sm ring-1 ring-slate-900/5 transition-shadow hover:shadow-md">
+                  <div>
+                    <p className="text-[0.7rem] font-bold uppercase tracking-widest text-slate-400">
+                      מס׳ הצעה
+                    </p>
+                    <p className="mt-1 text-base font-semibold text-slate-800 sm:text-lg">{shortenId(quote.invoice_id ?? quote.quotation_id)}</p>
+                  </div>
+                  <div>
+                    <p className="text-[0.7rem] font-bold uppercase tracking-widest text-slate-400">
+                      תאריך הפקה
+                    </p>
+                    <p className="mt-1 text-slate-700">{formatDate(quote.invoice_creation_date)}</p>
+                  </div>
+                  <div>
+                    <p className="text-[0.7rem] font-bold uppercase tracking-widest text-slate-400">
+                      שם הפרויקט
+                    </p>
+                    <p className="mt-1 text-slate-700">{quote.project_name ?? "—"}</p>
+                  </div>
                 </div>
-                <div className="flex items-center gap-4">
-                  <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full border-2 border-white/50 shadow-lg sm:h-24 sm:w-24">
+                <div className="flex items-center gap-4 rounded-2xl border border-slate-200/60 bg-white/80 p-4 shadow-sm ring-1 ring-slate-900/5 transition-shadow hover:shadow-md">
+                  <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl border-2 border-white shadow-lg ring-2 ring-slate-200/80 sm:h-24 sm:w-24">
                     {representative?.rep_avatar ? (
                       <Image
                         src={representative.rep_avatar}
@@ -132,7 +139,7 @@ export default async function QuotePage({
                     {representative?.rep_phone && (
                       <a
                         href={`tel:${representative.rep_phone.replace(/\D/g, "")}`}
-                        className="mt-1 block min-h-[44px] min-w-[44px] py-2 text-base text-gray-600 transition-colors hover:text-[#801a1e] sm:min-h-0 sm:min-w-0 sm:py-0 sm:text-sm"
+                        className="mt-1 inline-flex items-center rounded-lg px-2 py-1 text-base text-slate-600 transition-colors hover:bg-slate-100 hover:text-[#801a1e] sm:min-h-[44px] sm:min-w-[44px] sm:justify-center sm:py-2 sm:text-sm"
                         style={{ WebkitTapHighlightColor: 'transparent' }}
                       >
                         {representative.rep_phone}
@@ -143,26 +150,29 @@ export default async function QuotePage({
               </div>
               {/* Chart of numbers — financial summary on page 1 */}
               <div
-                className="flex flex-col gap-6 px-4 py-6 text-white sm:flex-row sm:flex-wrap sm:items-center sm:justify-start sm:gap-4 md:px-8"
-                style={{ backgroundColor: BRAND_RED }}
+                className="relative flex flex-col gap-6 px-4 py-6 text-white sm:flex-row sm:flex-wrap sm:items-center sm:justify-start sm:gap-4 md:px-8"
+                style={{
+                  background: `linear-gradient(135deg, ${BRAND_RED} 0%, #5c1316 100%)`,
+                  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.08), 0 4px 12px rgba(0,0,0,0.1)",
+                }}
               >
                 <div className="flex flex-col gap-4 text-left sm:flex-row sm:flex-wrap sm:gap-8 md:gap-12">
                   <div className="text-left">
-                    <p className="text-sm opacity-90">סה&quot;כ ללא מע&quot;מ</p>
-                    <p className="text-base font-semibold sm:text-lg" dir="ltr">{formatCurrency(subtotal)}</p>
+                    <p className="text-sm font-medium opacity-90">סה&quot;כ ללא מע&quot;מ</p>
+                    <p className="text-base font-bold sm:text-lg" dir="ltr">{formatCurrency(subtotal)}</p>
                   </div>
                   <div className="text-left">
-                    <p className="text-sm opacity-90">מע&quot;מ ({quote.vat}%)</p>
-                    <p className="text-base font-semibold sm:text-lg" dir="ltr">{formatCurrency(vatAmount)}</p>
+                    <p className="text-sm font-medium opacity-90">מע&quot;מ ({quote.vat}%)</p>
+                    <p className="text-base font-bold sm:text-lg" dir="ltr">{formatCurrency(vatAmount)}</p>
                   </div>
                   <div className="text-left">
-                    <p className="text-sm opacity-90">סה&quot;כ לתשלום</p>
-                    <p className="text-lg font-bold sm:text-xl" dir="ltr">{formatCurrency(total)}</p>
+                    <p className="text-sm font-medium opacity-90">סה&quot;כ לתשלום</p>
+                    <p className="text-xl font-bold sm:text-2xl" dir="ltr">{formatCurrency(total)}</p>
                   </div>
                 </div>
               </div>
               {/* Terms on page 1 */}
-              <div className="border-t border-gray-100 p-4 sm:p-6 md:p-8">
+              <div className="border-t border-slate-100 bg-slate-50/50 p-4 sm:p-6 md:p-8">
                 <h3
                   className="mb-4 text-base font-bold sm:text-lg"
                   style={{ color: BRAND_RED }}
@@ -170,32 +180,33 @@ export default async function QuotePage({
                   תנאי תשלום ומסחר
                 </h3>
                 {paymentTerms.length > 0 ? (
-                  <ul className="space-y-2 text-base text-gray-700 sm:text-sm">
+                  <ul className="space-y-3 text-base text-slate-700 sm:text-sm">
                     {paymentTerms.map((t, i) => (
-                      <li key={i} className="flex gap-2">
+                      <li key={i} className="flex gap-3 items-start">
                         <span
-                          className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-gray-800"
+                          className="mt-2 h-2 w-2 shrink-0 rounded-full opacity-90"
+                          style={{ backgroundColor: BRAND_RED }}
                           aria-hidden
                         />
-                        <span>{t.term}</span>
+                        <span className="leading-relaxed">{t.term}</span>
                       </li>
                     ))}
                   </ul>
                 ) : (
-                  <p className="text-sm text-gray-500">אין תנאים להצגה.</p>
+                  <p className="text-sm text-slate-500">אין תנאים להצגה.</p>
                 )}
               </div>
             </div>
 
-            {/* Product pages: contact strip top + product rows (image separate from price) + contact strip bottom */}
-            <section className="border-t border-gray-200/80">
+            {/* Product pages: contact strip top + product rows + contact strip bottom */}
+            <section className="border-t border-slate-200/80">
               <ContactStrip
                 repName={representative?.rep_full_name ?? null}
                 repPhone={representative?.rep_phone ?? null}
                 repAvatar={representative?.rep_avatar ?? null}
               />
               <div className="px-4 py-6 md:px-8">
-                {/* Mobile: product rows — image block first, then details/attributes/price/status separate */}
+                {/* Mobile: product rows — image block first, then details/attributes/price/status */}
                 <ul className="space-y-6 md:hidden">
                   {products.map((p, i) => {
                     const lineTotal =
@@ -203,11 +214,11 @@ export default async function QuotePage({
                     return (
                       <li
                         key={i}
-                        className="rounded-xl border border-gray-200/80 bg-white/60 shadow-sm backdrop-blur-sm overflow-hidden"
+                        className="quote-card-hover rounded-2xl border border-slate-200/80 bg-white/90 shadow-md overflow-hidden ring-1 ring-slate-900/5 backdrop-blur-sm"
                       >
-                        <div className="flex justify-center border-b border-gray-200/80 bg-gray-50/50 p-4">
+                        <div className="flex justify-center border-b border-slate-200/80 bg-gradient-to-b from-slate-50 to-white p-5">
                           {p.picture_url ? (
-                            <div className="relative h-48 w-full max-w-xs overflow-hidden rounded-lg border border-gray-200 bg-gray-100">
+                            <div className="relative h-52 w-full max-w-xs overflow-hidden rounded-xl border border-slate-200/80 bg-slate-100 shadow-inner">
                               <Image
                                 src={p.picture_url}
                                 alt=""
@@ -217,27 +228,26 @@ export default async function QuotePage({
                               />
                             </div>
                           ) : (
-                            <div className="h-48 w-full max-w-xs rounded-lg border border-gray-200 bg-gray-100" />
+                            <div className="h-52 w-full max-w-xs rounded-xl border border-slate-200 bg-slate-100" />
                           )}
                         </div>
-                        <div className="p-4 text-right space-y-2">
-                          <p className="text-xs text-gray-500">{p.sku ?? "—"}</p>
-                          <p className="font-medium text-slate-800">
+                        <div className="p-5 text-right space-y-3">
+                          <p className="text-[0.7rem] font-bold uppercase tracking-widest text-slate-400">{p.sku ?? "—"}</p>
+                          <p className="font-semibold text-slate-800 text-lg leading-snug">
                             {p.product_desc ?? "—"}
                           </p>
-                          <div className="flex flex-wrap justify-end gap-x-2 gap-y-0.5 text-xs text-gray-600">
-                            {getProductAttributes(p).map(({ label, value }) => (
-                              <span key={label}>{label}: {value}</span>
-                            ))}
-                          </div>
-                          <div className="flex flex-wrap justify-end gap-x-4 gap-y-1 text-sm pt-2 border-t border-gray-100">
-                            <span>כמות: {p.qty}</span>
-                            <span>{formatCurrency(Number(p.unit_price))} ליח׳</span>
-                            <span className="font-semibold text-slate-800">
+                          <ProductAttributesList
+                            attributes={getProductAttributes(p)}
+                            className="mt-3 rounded-xl bg-slate-50/80 p-3 border border-slate-100"
+                          />
+                          <div className="flex flex-wrap justify-end gap-x-5 gap-y-1 text-sm pt-3 border-t border-slate-100">
+                            <span className="text-slate-600">כמות: <strong className="text-slate-800">{p.qty}</strong></span>
+                            <span className="text-slate-600">{formatCurrency(Number(p.unit_price))} ליח׳</span>
+                            <span className="font-bold text-slate-800">
                               {formatCurrency(lineTotal)}
                             </span>
                           </div>
-                          <div className="pt-3">
+                          <div className="pt-4">
                             <ApprovalStatusSelect />
                           </div>
                         </div>
@@ -246,29 +256,34 @@ export default async function QuotePage({
                   })}
                 </ul>
                 {/* Desktop: table — image column separate from description/price columns */}
-                <div className="hidden overflow-x-auto md:block">
+                <div className="hidden overflow-x-auto md:block rounded-2xl border border-slate-200/80 overflow-hidden ring-1 ring-slate-900/5 shadow-sm">
                   <table className="w-full min-w-[720px] border-collapse text-right">
                     <thead>
-                      <tr className="border-y-2 border-gray-300 bg-gray-50/80">
-                        <th className="py-4 px-3 text-sm font-bold text-gray-600">
+                      <tr
+                        className="border-b-2 border-slate-200"
+                        style={{
+                          background: "linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%)",
+                        }}
+                      >
+                        <th className="py-4 px-4 text-xs font-bold uppercase tracking-wider text-slate-500">
                           תמונה
                         </th>
-                        <th className="py-4 px-3 text-sm font-bold text-gray-600">
+                        <th className="py-4 px-4 text-xs font-bold uppercase tracking-wider text-slate-500">
                           מק&quot;ט
                         </th>
-                        <th className="py-4 px-3 text-sm font-bold text-gray-600">
+                        <th className="py-4 px-4 text-xs font-bold uppercase tracking-wider text-slate-500">
                           תאור מוצר
                         </th>
-                        <th className="py-4 px-3 text-sm font-bold text-gray-600">
+                        <th className="py-4 px-4 text-xs font-bold uppercase tracking-wider text-slate-500">
                           כמות
                         </th>
-                        <th className="py-4 px-3 text-sm font-bold text-gray-600">
+                        <th className="py-4 px-4 text-xs font-bold uppercase tracking-wider text-slate-500">
                           מחיר ליח׳
                         </th>
-                        <th className="py-4 px-3 text-sm font-bold text-gray-600">
+                        <th className="py-4 px-4 text-xs font-bold uppercase tracking-wider text-slate-500">
                           סה&quot;כ
                         </th>
-                        <th className="py-4 px-3 text-sm font-bold text-gray-600">
+                        <th className="py-4 px-4 text-xs font-bold uppercase tracking-wider text-slate-500">
                           סטטוס אישור
                         </th>
                       </tr>
@@ -281,11 +296,11 @@ export default async function QuotePage({
                         return (
                           <tr
                             key={i}
-                            className="border-b border-gray-100 transition-colors hover:bg-gray-50/80"
+                            className="border-b border-slate-100 transition-colors hover:bg-slate-50/80 even:bg-slate-50/30"
                           >
-                            <td className="py-4 px-3 align-middle">
+                            <td className="py-4 px-4 align-middle">
                               {p.picture_url ? (
-                                <div className="relative h-36 w-28 shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-gray-100">
+                                <div className="relative h-36 w-28 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-slate-100 shadow-sm ring-1 ring-slate-900/5">
                                   <Image
                                     src={p.picture_url}
                                     alt=""
@@ -295,30 +310,30 @@ export default async function QuotePage({
                                   />
                                 </div>
                               ) : (
-                                <div className="h-36 w-28 rounded-lg border border-gray-200 bg-gray-100" />
+                                <div className="h-36 w-28 rounded-xl border border-slate-200 bg-slate-100" />
                               )}
                             </td>
-                            <td className="py-4 px-3 text-sm font-medium text-slate-800">
+                            <td className="py-4 px-4 text-sm font-medium text-slate-700">
                               {p.sku ?? "—"}
                             </td>
-                            <td className="py-4 px-3 align-top">
-                              <p className="font-medium text-slate-800">
+                            <td className="py-4 px-4 align-top">
+                              <p className="font-semibold text-slate-800">
                                 {p.product_desc ?? "—"}
                               </p>
-                              <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-gray-600">
-                                {getProductAttributes(p).map(({ label, value }) => (
-                                  <span key={label}>{label}: {value}</span>
-                                ))}
+                              <div className="mt-2 rounded-lg bg-slate-50/80 p-2.5 border border-slate-100 w-fit max-w-sm">
+                                <ProductAttributesList
+                                  attributes={getProductAttributes(p)}
+                                />
                               </div>
                             </td>
-                            <td className="py-4 px-3 text-gray-700">{p.qty}</td>
-                            <td className="py-4 px-3 text-gray-700">
+                            <td className="py-4 px-4 text-slate-700 font-medium">{p.qty}</td>
+                            <td className="py-4 px-4 text-slate-700">
                               {formatCurrency(Number(p.unit_price))}
                             </td>
-                            <td className="py-4 px-3 font-semibold text-slate-800">
+                            <td className="py-4 px-4 font-bold text-slate-800">
                               {formatCurrency(lineTotal)}
                             </td>
-                            <td className="py-4 px-3 align-top">
+                            <td className="py-4 px-4 align-top">
                               <ApprovalStatusSelect />
                             </td>
                           </tr>
@@ -337,21 +352,23 @@ export default async function QuotePage({
 
             {/* Signature footer at end of product pages */}
             {quote.require_signature && (
-              <div className="border-t border-gray-100 p-4 sm:p-6 md:p-8">
+              <div className="border-t border-slate-100 bg-slate-50/30 p-4 sm:p-6 md:p-8">
                 <QuoteSignature />
               </div>
             )}
           </div>
 
-        <footer className="mt-6 text-center text-sm text-gray-500 md:mt-8">
-          <p>כנרת 10, איירפורט סיטי</p>
-          <Link
-            href="/"
-            className="mt-2 inline-flex min-h-[44px] min-w-[44px] items-center justify-center text-base text-gray-600 transition-colors hover:text-[#801a1e] sm:min-h-0 sm:min-w-0 sm:text-sm"
-            style={{ WebkitTapHighlightColor: 'transparent' }}
-          >
-            csquotes.vercel.app
-          </Link>
+        <footer className="mt-8 text-center">
+          <div className="rounded-2xl border border-slate-200/80 bg-white/80 px-4 py-5 shadow-sm backdrop-blur-sm">
+            <p className="text-sm font-medium text-slate-600">כנרת 10, איירפורט סיטי</p>
+            <Link
+              href="/"
+              className="mt-2 inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg text-base font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-[#801a1e] sm:min-h-0 sm:min-w-0 sm:px-4 sm:text-sm"
+              style={{ WebkitTapHighlightColor: 'transparent' }}
+            >
+              csquotes.vercel.app
+            </Link>
+          </div>
         </footer>
       </div>
     </div>

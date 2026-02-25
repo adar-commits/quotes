@@ -23,6 +23,11 @@ export default function QuoteBanner() {
           onError={() => setImgError(true)}
         />
       )}
+      {/* Subtle bottom gradient overlay for depth */}
+      <div
+        className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"
+        aria-hidden
+      />
     </div>
   );
 }

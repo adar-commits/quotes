@@ -171,7 +171,7 @@ export default function QuoteSignature() {
   };
 
   return (
-    <section className="rounded-2xl border border-gray-200 bg-white/80 p-4 shadow-lg backdrop-blur-sm sm:p-6 md:p-8">
+    <section className="rounded-2xl border border-slate-200/80 bg-white/90 p-4 shadow-lg ring-1 ring-slate-900/5 backdrop-blur-sm sm:p-6 md:p-8">
       <h3 className="mb-4 text-center text-lg font-bold text-[#801a1e] sm:mb-6 sm:text-xl md:text-2xl">
         חתימה דיגיטלית על הצעת המחיר
       </h3>
@@ -184,12 +184,12 @@ export default function QuoteSignature() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder=" "
-              className="peer min-h-[44px] w-full rounded-lg border border-gray-300 bg-gray-50/50 px-3 py-3 pt-5 text-base text-right transition-colors focus:border-[#801a1e] focus:outline-none focus:ring-1 focus:ring-[#801a1e]"
+              className="peer min-h-[44px] w-full rounded-xl border-2 border-slate-200 bg-slate-50/80 px-3 py-3 pt-5 text-base text-right transition-all focus:border-[#801a1e] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#801a1e]/20"
               autoComplete="name"
             />
             <label
               htmlFor="sig-name"
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 transition-all peer-focus:top-3 peer-focus:text-xs peer-focus:text-[#801a1e] peer-[:not(:placeholder-shown)]:top-3 peer-[:not(:placeholder-shown)]:text-xs"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 transition-all peer-focus:top-3 peer-focus:text-xs peer-focus:text-[#801a1e] peer-focus:font-semibold peer-[:not(:placeholder-shown)]:top-3 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:font-semibold"
             >
               שם החותמ/ת
             </label>
@@ -201,12 +201,12 @@ export default function QuoteSignature() {
               value={role}
               onChange={(e) => setRole(e.target.value)}
               placeholder=" "
-              className="peer min-h-[44px] w-full rounded-lg border border-gray-300 bg-gray-50/50 px-3 py-3 pt-5 text-base text-right transition-colors focus:border-[#801a1e] focus:outline-none focus:ring-1 focus:ring-[#801a1e]"
+              className="peer min-h-[44px] w-full rounded-xl border-2 border-slate-200 bg-slate-50/80 px-3 py-3 pt-5 text-base text-right transition-all focus:border-[#801a1e] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#801a1e]/20"
               autoComplete="organization-title"
             />
             <label
               htmlFor="sig-role"
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 transition-all peer-focus:top-3 peer-focus:text-xs peer-focus:text-[#801a1e] peer-[:not(:placeholder-shown)]:top-3 peer-[:not(:placeholder-shown)]:text-xs"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 transition-all peer-focus:top-3 peer-focus:text-xs peer-focus:text-[#801a1e] peer-focus:font-semibold peer-[:not(:placeholder-shown)]:top-3 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:font-semibold"
             >
               תפקיד
             </label>
@@ -215,12 +215,12 @@ export default function QuoteSignature() {
         <div>
           <div
             ref={containerRef}
-            className="relative h-40 w-full touch-none select-none rounded-lg border-2 border-dashed border-gray-400 bg-gray-50 sm:h-48"
+            className="relative h-40 w-full touch-none select-none rounded-xl border-2 border-dashed border-slate-300 bg-slate-50/80 sm:h-48 ring-1 ring-slate-200/80 transition-colors focus-within:border-[#801a1e]/50 focus-within:ring-2 focus-within:ring-[#801a1e]/20"
             style={{ touchAction: "none" }}
           >
             <canvas
               ref={canvasRef}
-              className="absolute inset-0 cursor-crosshair rounded-lg"
+              className="absolute inset-0 cursor-crosshair rounded-xl"
               style={{ touchAction: "none" }}
               onMouseDown={handleMouseDown}
               onMouseMove={handleMouseMove}
@@ -233,18 +233,21 @@ export default function QuoteSignature() {
             <button
               type="button"
               onClick={clearCanvas}
-              className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-600 transition-colors hover:bg-gray-50"
+              className="rounded-xl border-2 border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-slate-50 hover:border-slate-300"
             >
               נקה חתימה
             </button>
-            <p className="text-sm text-gray-500">יש לחתום מעלה</p>
+            <p className="text-sm text-slate-500">יש לחתום מעלה</p>
           </div>
         </div>
       </div>
       <button
         type="button"
         className="mt-4 min-h-[48px] w-full rounded-xl bg-[#801a1e] px-6 py-4 text-base font-semibold text-white shadow-lg transition-all hover:bg-[#6b1619] hover:shadow-xl active:scale-[0.99] sm:mt-6 sm:text-lg"
-        style={{ WebkitTapHighlightColor: "transparent" }}
+        style={{
+          boxShadow: "0 4px 14px rgba(128, 26, 30, 0.35)",
+          WebkitTapHighlightColor: "transparent",
+        }}
       >
         שלח
       </button>
