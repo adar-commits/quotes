@@ -21,6 +21,7 @@ export type QuoteCustomerRow = {
   customer_id: string | null;
   customer_name: string | null;
   customer_address: string | null;
+  customer_logo: string | null;
 };
 
 export type QuoteRepresentativeRow = {
@@ -42,6 +43,7 @@ export type QuoteProductRow = {
   picture_url: string | null;
   product_desc: string | null;
   additional_desc: string | null;
+  approval_status: string | null;
 };
 
 export type QuotePaymentTermRow = {
@@ -73,7 +75,7 @@ export async function getQuoteByPublicId(
   const [customerRes, repRes, productsRes, termsRes] = await Promise.all([
     supabase
       .from("quote_customers")
-      .select("customer_id, customer_name, customer_address")
+      .select("customer_id, customer_name, customer_address, customer_logo")
       .eq("quote_id", quote.id)
       .maybeSingle(),
     supabase

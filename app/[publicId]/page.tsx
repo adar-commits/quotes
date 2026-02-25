@@ -9,6 +9,7 @@ import DefaultAvatar from "./DefaultAvatar";
 import ApprovalStatusSelect from "./ApprovalStatusSelect";
 import ContactStrip from "./ContactStrip";
 import ProductAttributesList from "./ProductAttributesList";
+import ProductImageWithLightbox from "./ProductImageWithLightbox";
 
 const BRAND_RED = "#801a1e";
 
@@ -98,6 +99,17 @@ export default async function QuotePage({
                   <p className="mt-2 text-base font-semibold text-slate-800 sm:text-lg">
                     {customer?.customer_name ?? "—"}
                   </p>
+                  {customer?.customer_logo && (
+                    <div className="mt-3 relative h-16 w-auto max-w-[140px] aspect-[2/1] overflow-hidden rounded-lg border border-slate-200/80 bg-slate-50">
+                      <Image
+                        src={customer.customer_logo}
+                        alt=""
+                        fill
+                        className="object-contain object-left"
+                        sizes="140px"
+                      />
+                    </div>
+                  )}
                 </div>
                 <div className="space-y-3 rounded-2xl border border-slate-200/60 bg-white/80 p-4 shadow-sm ring-1 ring-slate-900/5 transition-shadow hover:shadow-md">
                   <div>
@@ -148,31 +160,32 @@ export default async function QuotePage({
                   </div>
                 </div>
               </div>
-              {/* Chart of numbers — financial summary on page 1 */}
+              {/* Chart of numbers — financial summary on page 1 (left-aligned) */}
               <div
-                className="relative flex flex-col gap-6 px-4 py-6 text-white sm:flex-row sm:flex-wrap sm:items-center sm:justify-start sm:gap-4 md:px-8"
+                className="relative flex flex-col gap-6 px-4 py-6 text-white sm:flex-row sm:flex-wrap sm:items-center sm:gap-4 md:px-8"
                 style={{
                   background: `linear-gradient(135deg, ${BRAND_RED} 0%, #5c1316 100%)`,
                   boxShadow: "inset 0 1px 0 rgba(255,255,255,0.08), 0 4px 12px rgba(0,0,0,0.1)",
                 }}
+                dir="ltr"
               >
                 <div className="flex flex-col gap-4 text-left sm:flex-row sm:flex-wrap sm:gap-8 md:gap-12">
                   <div className="text-left">
                     <p className="text-sm font-medium opacity-90">סה&quot;כ ללא מע&quot;מ</p>
-                    <p className="text-base font-bold sm:text-lg" dir="ltr">{formatCurrency(subtotal)}</p>
+                    <p className="text-base font-bold sm:text-lg">{formatCurrency(subtotal)}</p>
                   </div>
                   <div className="text-left">
                     <p className="text-sm font-medium opacity-90">מע&quot;מ ({quote.vat}%)</p>
-                    <p className="text-base font-bold sm:text-lg" dir="ltr">{formatCurrency(vatAmount)}</p>
+                    <p className="text-base font-bold sm:text-lg">{formatCurrency(vatAmount)}</p>
                   </div>
                   <div className="text-left">
                     <p className="text-sm font-medium opacity-90">סה&quot;כ לתשלום</p>
-                    <p className="text-xl font-bold sm:text-2xl" dir="ltr">{formatCurrency(total)}</p>
+                    <p className="text-xl font-bold sm:text-2xl">{formatCurrency(total)}</p>
                   </div>
                 </div>
               </div>
-              {/* Terms on page 1 */}
-              <div className="border-t border-slate-100 bg-slate-50/50 p-4 sm:p-6 md:p-8">
+              {/* Terms on page 1 (left-aligned) */}
+              <div className="border-t border-slate-100 bg-slate-50/50 p-4 sm:p-6 md:p-8 text-left">
                 <h3
                   className="mb-4 text-base font-bold sm:text-lg"
                   style={{ color: BRAND_RED }}
@@ -200,11 +213,7 @@ export default async function QuotePage({
 
             {/* Product pages: contact strip top + product rows + contact strip bottom */}
             <section className="border-t border-slate-200/80">
-              <ContactStrip
-                repName={representative?.rep_full_name ?? null}
-                repPhone={representative?.rep_phone ?? null}
-                repAvatar={representative?.rep_avatar ?? null}
-              />
+              <ContactStrip />
               <div className="px-4 py-6 md:px-8">
                 {/* Mobile: product rows — image block first, then details/attributes/price/status */}
                 <ul className="space-y-6 md:hidden">
@@ -217,19 +226,13 @@ export default async function QuotePage({
                         className="quote-card-hover rounded-2xl border border-slate-200/80 bg-white/90 shadow-md overflow-hidden ring-1 ring-slate-900/5 backdrop-blur-sm"
                       >
                         <div className="flex justify-center border-b border-slate-200/80 bg-gradient-to-b from-slate-50 to-white p-5">
-                          {p.picture_url ? (
-                            <div className="relative h-52 w-full max-w-xs overflow-hidden rounded-xl border border-slate-200/80 bg-slate-100 shadow-inner">
-                              <Image
-                                src={p.picture_url}
-                                alt=""
-                                fill
-                                className="object-contain"
-                                sizes="(max-width: 384px) 100vw, 384px"
-                              />
-                            </div>
-                          ) : (
-                            <div className="h-52 w-full max-w-xs rounded-xl border border-slate-200 bg-slate-100" />
-                          )}
+                          <ProductImageWithLightbox
+                            src={p.picture_url}
+                            fill
+                            className="object-contain"
+                            containerClassName="relative h-52 w-full max-w-xs overflow-hidden rounded-xl border border-slate-200/80 bg-slate-100 shadow-inner"
+                            sizes="(max-width: 384px) 100vw, 384px"
+                          />
                         </div>
                         <div className="p-5 text-right space-y-3">
                           <p className="text-[0.7rem] font-bold uppercase tracking-widest text-slate-400">{p.sku ?? "—"}</p>
@@ -248,7 +251,11 @@ export default async function QuotePage({
                             </span>
                           </div>
                           <div className="pt-4">
-                            <ApprovalStatusSelect />
+                            <ApprovalStatusSelect
+                              quotePublicId={publicId}
+                              productSortOrder={p.sort_order}
+                              initialStatus={p.approval_status}
+                            />
                           </div>
                         </div>
                       </li>
@@ -299,19 +306,13 @@ export default async function QuotePage({
                             className="border-b border-slate-100 transition-colors hover:bg-slate-50/80 even:bg-slate-50/30"
                           >
                             <td className="py-4 px-4 align-middle">
-                              {p.picture_url ? (
-                                <div className="relative h-36 w-28 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-slate-100 shadow-sm ring-1 ring-slate-900/5">
-                                  <Image
-                                    src={p.picture_url}
-                                    alt=""
-                                    fill
-                                    className="object-cover"
-                                    sizes="112px"
-                                  />
-                                </div>
-                              ) : (
-                                <div className="h-36 w-28 rounded-xl border border-slate-200 bg-slate-100" />
-                              )}
+                              <ProductImageWithLightbox
+                                src={p.picture_url}
+                                fill
+                                className="object-cover"
+                                containerClassName="relative h-36 w-28 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-slate-100 shadow-sm ring-1 ring-slate-900/5"
+                                sizes="112px"
+                              />
                             </td>
                             <td className="py-4 px-4 text-sm font-medium text-slate-700">
                               {p.sku ?? "—"}
@@ -334,7 +335,11 @@ export default async function QuotePage({
                               {formatCurrency(lineTotal)}
                             </td>
                             <td className="py-4 px-4 align-top">
-                              <ApprovalStatusSelect />
+                              <ApprovalStatusSelect
+                                quotePublicId={publicId}
+                                productSortOrder={p.sort_order}
+                                initialStatus={p.approval_status}
+                              />
                             </td>
                           </tr>
                         );
@@ -343,11 +348,7 @@ export default async function QuotePage({
                   </table>
                 </div>
               </div>
-              <ContactStrip
-                repName={representative?.rep_full_name ?? null}
-                repPhone={representative?.rep_phone ?? null}
-                repAvatar={representative?.rep_avatar ?? null}
-              />
+              <ContactStrip />
             </section>
 
             {/* Signature footer at end of product pages */}
