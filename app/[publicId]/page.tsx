@@ -69,14 +69,24 @@ export default async function QuotePage({
               <span className="inline-flex rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700">
                 הצעת מחיר
               </span>
+              {quote.quotation_id && (
+                <p className="text-sm font-medium text-slate-700">
+                  מס׳ הצעה: {quote.quotation_id}
+                </p>
+              )}
               <p className="text-sm text-gray-500">
                 {quote.invoice_id
-                  ? `מס׳ ${quote.invoice_id.slice(0, 8)}…`
+                  ? `חשבון: ${quote.invoice_id.slice(0, 8)}…`
                   : quote.public_id}
               </p>
               <p className="text-sm text-gray-600">
                 תאריך: {formatDate(quote.invoice_creation_date)}
               </p>
+              {(quote.agent_code || quote.agent_desc) && (
+                <p className="text-xs text-gray-500">
+                  {[quote.agent_code, quote.agent_desc].filter(Boolean).join(" • ")}
+                </p>
+              )}
             </div>
           </header>
 
@@ -92,6 +102,11 @@ export default async function QuotePage({
               {customer?.customer_id && (
                 <p className="mt-1 text-sm text-gray-500">
                   מס׳ לקוח: {customer.customer_id}
+                </p>
+              )}
+              {customer?.customer_address && (
+                <p className="mt-2 text-sm text-gray-600">
+                  {customer.customer_address}
                 </p>
               )}
             </div>
