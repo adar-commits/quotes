@@ -76,6 +76,7 @@ async function run() {
 run()
   .then(() => client.end())
   .catch((e) => {
+    console.error(e?.message || e);
     client.end().catch(() => {});
     process.exit(1);
   });

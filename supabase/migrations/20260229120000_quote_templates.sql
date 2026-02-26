@@ -29,7 +29,7 @@ VALUES
   ('Elite Rugs', 'elite_rugs', '#059669', '#059669', NULL, NULL, NULL, '#059669')
 ON CONFLICT (template_key) DO NOTHING;
 
-CREATE INDEX idx_quotes_template_id ON quotes(template_id);
+CREATE INDEX IF NOT EXISTS idx_quotes_template_id ON quotes(template_id);
 
 -- RLS
 ALTER TABLE quote_templates ENABLE ROW LEVEL SECURITY;
