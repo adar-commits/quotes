@@ -141,12 +141,13 @@ export async function POST(request: NextRequest) {
   }
 
   const customer = q.customer;
-  if (customer) {
+  if (customer && typeof customer === "object") {
+    const c = customer as Record<string, unknown>;
     await supabase.from("quote_customers").insert({
       quote_id: quoteId,
-      customer_id: customer.customerID ?? null,
-      customer_name: customer.customerName ?? null,
-      customer_address: customer.customerAddress ?? null,
+      customer_id: (c.customerID ?? c.customer_id) ?? null,
+      customer_name: (c.customerName ?? c.customer_name) ?? null,
+      customer_address: (c.customerAddress ?? c.customer_address) ?? null,
     });
   }
 

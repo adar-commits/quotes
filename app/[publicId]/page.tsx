@@ -148,7 +148,7 @@ export default async function QuotePage({
                     שם לקוח
                   </p>
                   <p className="mt-2 text-base font-semibold text-slate-800 sm:text-lg">
-                    {customer?.customer_name ?? "—"}
+                    {customer?.customer_name || customer?.customer_id ?? "—"}
                   </p>
                   {customer?.customer_logo && (
                     <div className="mt-3 relative h-16 w-auto max-w-[140px] aspect-[2/1] overflow-hidden rounded-lg border border-slate-200/80 bg-slate-50">
@@ -168,7 +168,7 @@ export default async function QuotePage({
                     <p className="text-[0.7rem] font-bold uppercase tracking-widest text-slate-400">
                       מס׳ הצעה
                     </p>
-                    <p className="mt-1 text-base font-semibold text-slate-800 sm:text-lg">{quote.quotation_id ?? quote.invoice_id ?? "—"}</p>
+                    <p className="mt-1 text-base font-semibold text-slate-800 sm:text-lg">{quote.public_id ? quote.public_id.slice(-10) : (quote.quotation_id ?? quote.invoice_id ?? "—")}</p>
                   </div>
                   <div>
                     <p className="text-[0.7rem] font-bold uppercase tracking-widest text-slate-400">
