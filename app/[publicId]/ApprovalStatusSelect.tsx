@@ -96,7 +96,7 @@ export default function ApprovalStatusSelect({
         </button>
         {open && (
           <ul
-            className="absolute top-full left-0 right-0 z-10 mt-1 rounded-xl border border-slate-200 bg-white py-1 shadow-lg"
+            className="absolute top-full left-0 right-0 z-[100] mt-1 rounded-xl border border-slate-200 bg-white py-1 shadow-xl"
             role="listbox"
           >
             {OPTIONS.map(({ value, label }) => (

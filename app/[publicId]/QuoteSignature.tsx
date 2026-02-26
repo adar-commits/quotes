@@ -2,9 +2,14 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-export default function QuoteSignature() {
+type Props = { quotePublicId: string };
+
+export default function QuoteSignature({ quotePublicId }: Props) {
   const [name, setName] = useState("");
   const [role, setRole] = useState("");
+  const [signed, setSigned] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const isDrawingRef = useRef(false);
@@ -170,6 +175,35 @@ export default function QuoteSignature() {
     ctx.clearRect(0, 0, w, h);
   };
 
+  const handleSubmit = async () => {
+    setError(null);
+    setSubmitting(true);
+    try {
+      const res = await fetch(`/api/quotes/${quotePublicId}/sign`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ signerName: name, signerRole: role }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error ?? "שגיאה בשמירה");
+      }
+      setSigned(true);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "שגיאה בשמירה");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (signed) {
+    return (
+      <section className="rounded-2xl border border-slate-200/80 bg-white/90 p-4 shadow-lg ring-1 ring-slate-900/5 backdrop-blur-sm sm:p-6 md:p-8">
+        <p className="text-center text-lg font-bold text-[#801a1e]">ההצעה נחתמה בהצלחה • Status: Signed</p>
+      </section>
+    );
+  }
+
   return (
     <section className="rounded-2xl border border-slate-200/80 bg-white/90 p-4 shadow-lg ring-1 ring-slate-900/5 backdrop-blur-sm sm:p-6 md:p-8">
       <h3 className="mb-4 text-center text-lg font-bold text-[#801a1e] sm:mb-6 sm:text-xl md:text-2xl">
@@ -241,15 +275,22 @@ export default function QuoteSignature() {
           </div>
         </div>
       </div>
+      {error && (
+        <p className="mt-2 text-center text-sm text-red-600" role="alert">
+          {error}
+        </p>
+      )}
       <button
         type="button"
-        className="mt-4 min-h-[48px] w-full rounded-xl bg-[#801a1e] px-6 py-4 text-base font-semibold text-white shadow-lg transition-all hover:bg-[#6b1619] hover:shadow-xl active:scale-[0.99] sm:mt-6 sm:text-lg"
+        onClick={handleSubmit}
+        disabled={submitting}
+        className="mt-4 min-h-[48px] w-full rounded-xl bg-[#801a1e] px-6 py-4 text-base font-semibold text-white shadow-lg transition-all hover:bg-[#6b1619] hover:shadow-xl active:scale-[0.99] disabled:opacity-70 sm:mt-6 sm:text-lg"
         style={{
           boxShadow: "0 4px 14px rgba(128, 26, 30, 0.35)",
           WebkitTapHighlightColor: "transparent",
         }}
       >
-        שלח
+        {submitting ? "שולח..." : "שלח"}
       </button>
     </section>
   );

@@ -36,7 +36,7 @@ export default function ProductImageWithLightbox({
   if (!src) {
     return (
       <div
-        className={`bg-slate-100 border border-slate-200 ${containerClassName ?? ""}`}
+        className={`bg-slate-100/80 ${containerClassName ?? ""}`}
         style={
           width && height
             ? { width, height }
@@ -56,7 +56,7 @@ export default function ProductImageWithLightbox({
         className={`block text-left w-full h-full min-h-[120px] ${containerClassName ?? ""}`}
         aria-label="הגדל תמונה"
       >
-        <div className="relative w-full h-full overflow-hidden rounded-xl border border-slate-200/80 bg-slate-100 shadow-sm ring-1 ring-slate-900/5 transition-transform hover:scale-[1.02]">
+        <div className="relative w-full h-full overflow-hidden rounded-xl bg-slate-100/50 transition-transform hover:scale-[1.02]">
           <Image
             src={src}
             alt={alt}

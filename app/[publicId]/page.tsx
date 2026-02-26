@@ -113,7 +113,7 @@ export default async function QuotePage({
                 </div>
                 {/* Col 2 (middle in RTL): Salesperson — repositioned next to customer */}
                 <div className="flex items-center gap-4 rounded-2xl border border-slate-200/60 bg-white/80 p-4 shadow-sm ring-1 ring-slate-900/5 transition-shadow hover:shadow-md">
-                  <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl border-2 border-white shadow-lg ring-2 ring-slate-200/80 sm:h-24 sm:w-24">
+                  <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl sm:h-24 sm:w-24">
                     {representative?.rep_avatar ? (
                       <Image
                         src={representative.rep_avatar}
@@ -149,7 +149,7 @@ export default async function QuotePage({
                     <p className="text-[0.7rem] font-bold uppercase tracking-widest text-slate-400">
                       מס׳ הצעה
                     </p>
-                    <p className="mt-1 text-base font-semibold text-slate-800 sm:text-lg">{shortenId(quote.invoice_id ?? quote.quotation_id)}</p>
+                    <p className="mt-1 text-base font-semibold text-slate-800 sm:text-lg">{quote.quotation_id ?? quote.invoice_id ?? "—"}</p>
                   </div>
                   <div>
                     <p className="text-[0.7rem] font-bold uppercase tracking-widest text-slate-400">
@@ -164,6 +164,34 @@ export default async function QuotePage({
                     <p className="mt-1 text-slate-700">{quote.project_name ?? "—"}</p>
                   </div>
                 </div>
+              </div>
+              {/* Chart table: מק"ט, תאור מוצר, כמות, מחיר ליחידה, סה"כ — above calculations strip */}
+              <div className="overflow-x-auto border-t border-slate-200/80">
+                <table className="w-full min-w-[500px] border-collapse text-right">
+                  <thead>
+                    <tr className="border-b border-slate-200 bg-slate-50/80">
+                      <th className="py-3 px-3 text-xs font-bold uppercase tracking-wider text-slate-500">מק&quot;ט</th>
+                      <th className="py-3 px-3 text-xs font-bold uppercase tracking-wider text-slate-500">תאור מוצר</th>
+                      <th className="py-3 px-3 text-xs font-bold uppercase tracking-wider text-slate-500">כמות</th>
+                      <th className="py-3 px-3 text-xs font-bold uppercase tracking-wider text-slate-500">מחיר ליחידה</th>
+                      <th className="py-3 px-3 text-xs font-bold uppercase tracking-wider text-slate-500">סה&quot;כ</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {products.map((p, i) => {
+                      const lineTotal = p.qty * (Number(p.unit_price) - Number(p.unit_discount));
+                      return (
+                        <tr key={i} className="border-b border-slate-100">
+                          <td className="py-3 px-3 text-sm text-slate-700">{p.sku ?? "—"}</td>
+                          <td className="py-3 px-3 text-sm text-slate-700">{p.product_desc ?? "—"}</td>
+                          <td className="py-3 px-3 text-sm text-slate-700">{p.qty}</td>
+                          <td className="py-3 px-3 text-sm text-slate-700" dir="ltr">{formatCurrency(Number(p.unit_price))}</td>
+                          <td className="py-3 px-3 text-sm font-semibold text-slate-800" dir="ltr">{formatCurrency(lineTotal)}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
               {/* Chart of numbers — financial summary on page 1 (left-aligned) */}
               <div
@@ -220,6 +248,17 @@ export default async function QuotePage({
             <section className="border-t border-slate-200/80">
               <ContactStrip />
               <div className="px-4 py-6 md:px-8">
+                {/* Theme logo above product list headline */}
+                <div className="mb-4 flex justify-center">
+                  <Image
+                    src="https://quotes.carpetshop.co.il/img/invoice_header.jpg"
+                    alt="השטיח האדום"
+                    width={180}
+                    height={72}
+                    className="h-16 w-auto object-contain object-center md:h-20"
+                    sizes="180px"
+                  />
+                </div>
                 <h2 className="mb-6 text-right text-lg font-bold text-slate-800 sm:text-xl">
                   להלן רשימת המוצרים המשתתפים בהצעה
                 </h2>
@@ -234,18 +273,18 @@ export default async function QuotePage({
                         key={i}
                         className="quote-card-hover flex flex-col gap-4 rounded-2xl border border-slate-200/80 bg-white/90 p-4 shadow-md ring-1 ring-slate-900/5 backdrop-blur-sm md:flex-row md:items-start md:gap-6 md:p-6"
                       >
-                        {/* Product image — visible, one side */}
-                        <div className="flex shrink-0 justify-center md:w-64 md:justify-start">
+                        {/* Product image — no border, larger; text pushed left (more space for image) */}
+                        <div className="flex shrink-0 justify-center md:w-[22rem] md:justify-start">
                           <ProductImageWithLightbox
                             src={p.picture_url}
                             fill
                             className="object-contain"
-                            containerClassName="relative h-52 w-full max-w-sm overflow-hidden rounded-xl border border-slate-200/80 bg-slate-50 shadow-inner md:h-56 md:max-w-[16rem]"
-                            sizes="(max-width: 768px) 100vw, 256px"
+                            containerClassName="relative h-64 w-full max-w-sm overflow-hidden rounded-xl bg-slate-50/80 md:h-80 md:max-w-none"
+                            sizes="(max-width: 768px) 100vw, 352px"
                           />
                         </div>
-                        {/* Attributes + details — other side (reference: שם המוצר: value, טכניקת אריגה: value, etc.) */}
-                        <div className="min-w-0 flex-1 text-right space-y-3">
+                        {/* Attributes + details — other side */}
+                        <div className="min-w-0 flex-1 text-right space-y-3 md:max-w-[50%]">
                           <p className="text-[0.7rem] font-bold uppercase tracking-widest text-slate-400">
                             {p.sku ?? "—"}
                           </p>
@@ -285,7 +324,7 @@ export default async function QuotePage({
             {/* Signature footer at end of product pages */}
             {quote.require_signature && (
               <div className="border-t border-slate-100 bg-slate-50/30 p-4 sm:p-6 md:p-8">
-                <QuoteSignature />
+                <QuoteSignature quotePublicId={publicId} />
               </div>
             )}
           </div>

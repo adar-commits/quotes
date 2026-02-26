@@ -15,6 +15,7 @@ export type QuoteRow = {
   invoice_creation_date: string | null;
   agent_code: string | null;
   agent_desc: string | null;
+  status?: string | null;
 };
 
 export type QuoteCustomerRow = {
