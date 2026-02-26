@@ -28,6 +28,9 @@ export default function LoginPage() {
         >
           {loading ? "Signing in…" : "Sign in with Google"}
         </button>
+        <p className="text-center text-xs text-zinc-500">
+          לאחר ההתחברות תוכל לגשת ל־<a href="/settings" className="underline">הגדרות תבניות</a>.
+        </p>
       </main>
     </div>
   );

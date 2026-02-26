@@ -3,6 +3,19 @@ import { createClient } from "@supabase/supabase-js";
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
+export type QuoteTemplateRow = {
+  id: string;
+  name: string;
+  template_key: string;
+  main_color: string;
+  bullets_color: string | null;
+  banner_url: string | null;
+  background_url: string | null;
+  favicon_url: string | null;
+  logo_url: string | null;
+  contact_strip_bg: string | null;
+};
+
 export type QuoteRow = {
   id: string;
   public_id: string;
@@ -16,6 +29,7 @@ export type QuoteRow = {
   agent_code: string | null;
   agent_desc: string | null;
   status?: string | null;
+  template_id: string | null;
 };
 
 export type QuoteCustomerRow = {
@@ -58,6 +72,7 @@ export type QuoteWithDetails = {
   representative: QuoteRepresentativeRow | null;
   products: QuoteProductRow[];
   paymentTerms: QuotePaymentTermRow[];
+  template: QuoteTemplateRow | null;
 };
 
 export async function getQuoteByPublicId(
@@ -72,6 +87,25 @@ export async function getQuoteByPublicId(
     .single();
 
   if (quoteError || !quote) return null;
+
+  const templateId = (quote as { template_id?: string | null }).template_id;
+  let template: QuoteTemplateRow | null = null;
+  if (templateId) {
+    const { data: t } = await supabase
+      .from("quote_templates")
+      .select("*")
+      .eq("id", templateId)
+      .single();
+    template = t as QuoteTemplateRow | null;
+  }
+  if (!template) {
+    const { data: t } = await supabase
+      .from("quote_templates")
+      .select("*")
+      .eq("template_key", "redcarpet")
+      .single();
+    template = t as QuoteTemplateRow | null;
+  }
 
   const [customerRes, repRes, productsRes, termsRes] = await Promise.all([
     supabase
@@ -102,5 +136,6 @@ export async function getQuoteByPublicId(
     representative: repRes.data as QuoteRepresentativeRow | null,
     products: (productsRes.data ?? []) as QuoteProductRow[],
     paymentTerms: (termsRes.data ?? []) as QuotePaymentTermRow[],
+    template,
   };
 }

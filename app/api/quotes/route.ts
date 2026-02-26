@@ -38,6 +38,20 @@ export async function POST(request: NextRequest) {
   const supabase = createServiceRoleClient();
   const quotationId = (q.quotationID ?? "").trim();
 
+  let templateId: string | null = null;
+  const rawTemplateId = (raw as { template_id?: string | null }).template_id;
+  const rawTemplateKey = (raw as { template_key?: string | null }).template_key;
+  if (rawTemplateId && typeof rawTemplateId === "string") {
+    templateId = rawTemplateId;
+  } else if (rawTemplateKey && typeof rawTemplateKey === "string") {
+    const { data: t } = await supabase
+      .from("quote_templates")
+      .select("id")
+      .eq("template_key", rawTemplateKey.trim())
+      .single();
+    if (t) templateId = t.id;
+  }
+
   // If quotation_id (e.g. OP-xxx) is sent and exists, update that quote instead of creating
   let quoteId: string;
   let publicId: string;
@@ -63,6 +77,7 @@ export async function POST(request: NextRequest) {
         invoice_creation_date: parseInvoiceDate(q.invoiceCreationDate ?? ""),
         agent_code: q.agentCode ?? null,
         agent_desc: q.agentDesc ?? null,
+        template_id: templateId,
         updated_at: new Date().toISOString(),
       }).eq("id", quoteId);
 
@@ -83,6 +98,7 @@ export async function POST(request: NextRequest) {
           invoice_creation_date: parseInvoiceDate(q.invoiceCreationDate ?? ""),
           agent_code: q.agentCode ?? null,
           agent_desc: q.agentDesc ?? null,
+          template_id: templateId,
         })
         .select("id, public_id")
         .single();
@@ -109,6 +125,7 @@ export async function POST(request: NextRequest) {
         invoice_creation_date: parseInvoiceDate(q.invoiceCreationDate ?? ""),
         agent_code: q.agentCode ?? null,
         agent_desc: q.agentDesc ?? null,
+        template_id: templateId,
       })
       .select("id, public_id")
       .single();
@@ -183,6 +200,7 @@ export async function POST(request: NextRequest) {
   return NextResponse.json({
     public_id: publicId,
     quote_id: quoteId,
+    template_id: templateId ?? undefined,
     url,
   });
 }

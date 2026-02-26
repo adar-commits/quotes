@@ -32,4 +32,7 @@ export type QuotationPayload = {
   specialDiscount: number;
   requireSignature: boolean;
   invoiceCreationDate: string;
+  /** Template id (uuid) or template_key (e.g. 'redcarpet' | 'pozitive' | 'elite_rugs') for theming */
+  template_id?: string | null;
+  template_key?: string | null;
 };

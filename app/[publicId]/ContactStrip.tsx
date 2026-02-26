@@ -1,4 +1,4 @@
-const BRAND_RED = "#801a1e";
+const DEFAULT_STRIP_COLOR = "#801a1e";
 
 const CONTACT = {
   phone: "054-9668390",
@@ -36,12 +36,22 @@ function IconEmail({ className }: { className?: string }) {
   );
 }
 
-export default function ContactStrip() {
+function darken(hex: string, pct: number): string {
+  const n = parseInt(hex.slice(1), 16);
+  const r = Math.max(0, ((n >> 16) & 0xff) * (1 - pct));
+  const g = Math.max(0, ((n >> 8) & 0xff) * (1 - pct));
+  const b = Math.max(0, (n & 0xff) * (1 - pct));
+  return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+}
+
+export default function ContactStrip({ mainColor }: { mainColor?: string | null }) {
+  const color = mainColor || DEFAULT_STRIP_COLOR;
+  const dark = darken(color, 0.2);
   return (
     <div
       className="flex flex-wrap items-center justify-center gap-6 px-4 py-3.5 text-white md:px-6"
       style={{
-        background: `linear-gradient(90deg, #5c1316 0%, ${BRAND_RED} 30%, ${BRAND_RED} 70%, #5c1316 100%)`,
+        background: `linear-gradient(90deg, ${dark} 0%, ${color} 30%, ${color} 70%, ${dark} 100%)`,
         boxShadow: "inset 0 1px 0 rgba(255,255,255,0.12), 0 2px 8px rgba(0,0,0,0.06)",
       }}
       dir="ltr"
