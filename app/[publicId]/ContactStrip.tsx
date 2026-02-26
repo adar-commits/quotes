@@ -39,7 +39,7 @@ function IconEmail({ className }: { className?: string }) {
 export default function ContactStrip() {
   return (
     <div
-      className="flex flex-wrap items-center justify-start gap-6 px-4 py-3.5 text-white md:px-6"
+      className="flex flex-wrap items-center justify-center gap-6 px-4 py-3.5 text-white md:px-6"
       style={{
         background: `linear-gradient(90deg, #5c1316 0%, ${BRAND_RED} 30%, ${BRAND_RED} 70%, #5c1316 100%)`,
         boxShadow: "inset 0 1px 0 rgba(255,255,255,0.12), 0 2px 8px rgba(0,0,0,0.06)",

@@ -8,7 +8,6 @@ import QuoteBanner from "./QuoteBanner";
 import DefaultAvatar from "./DefaultAvatar";
 import ApprovalStatusSelect from "./ApprovalStatusSelect";
 import ContactStrip from "./ContactStrip";
-import ProductAttributesList from "./ProductAttributesList";
 import ProductImageWithLightbox from "./ProductImageWithLightbox";
 
 const BRAND_RED = "#801a1e";
@@ -88,10 +87,11 @@ export default async function QuotePage({
         <div className="fixed inset-0 -z-10 bg-gradient-to-br from-amber-100/85 via-rose-50/80 to-stone-200/85 backdrop-blur-[2px]" aria-hidden />
         <div className="mx-auto max-w-5xl p-4 py-6 md:p-8 md:py-8">
           <div className="overflow-hidden rounded-3xl border border-white/40 bg-white/90 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] ring-1 ring-black/5 backdrop-blur-xl">
-            {/* Page 1: Quotation numbers chart — banner + info + financial summary only */}
+            {/* Page 1: Chart only — banner + customer/salesperson (right) + quote details + financial summary */}
             <div className="border-b border-slate-200/60">
               <QuoteBanner />
               <div className="grid grid-cols-1 gap-6 border-t border-slate-200/80 bg-gradient-to-b from-slate-50/90 to-white p-4 backdrop-blur-sm sm:p-6 md:grid-cols-3 md:p-8">
+                {/* Col 1 (right in RTL): Customer */}
                 <div className="rounded-2xl border border-slate-200/60 bg-white/80 p-4 shadow-sm ring-1 ring-slate-900/5 transition-shadow hover:shadow-md">
                   <p className="text-[0.7rem] font-bold uppercase tracking-widest text-slate-400">
                     שם לקוח
@@ -111,6 +111,39 @@ export default async function QuotePage({
                     </div>
                   )}
                 </div>
+                {/* Col 2 (middle in RTL): Salesperson — repositioned next to customer */}
+                <div className="flex items-center gap-4 rounded-2xl border border-slate-200/60 bg-white/80 p-4 shadow-sm ring-1 ring-slate-900/5 transition-shadow hover:shadow-md">
+                  <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl border-2 border-white shadow-lg ring-2 ring-slate-200/80 sm:h-24 sm:w-24">
+                    {representative?.rep_avatar ? (
+                      <Image
+                        src={representative.rep_avatar}
+                        alt=""
+                        fill
+                        className="object-cover"
+                      />
+                    ) : (
+                      <DefaultAvatar />
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-[0.7rem] font-bold uppercase tracking-widest text-slate-400">
+                      מפיק ההצעה
+                    </p>
+                    <p className="mt-1 font-semibold text-slate-800">
+                      {representative?.rep_full_name ?? "—"}
+                    </p>
+                    {representative?.rep_phone && (
+                      <a
+                        href={`tel:${representative.rep_phone.replace(/\D/g, "")}`}
+                        className="mt-1 inline-flex items-center rounded-lg px-2 py-1 text-base text-slate-600 transition-colors hover:bg-slate-100 hover:text-[#801a1e] sm:min-h-[44px] sm:min-w-[44px] sm:justify-center sm:py-2 sm:text-sm"
+                        style={{ WebkitTapHighlightColor: 'transparent' }}
+                      >
+                        {representative.rep_phone}
+                      </a>
+                    )}
+                  </div>
+                </div>
+                {/* Col 3 (left in RTL): Quote #, date, project */}
                 <div className="space-y-3 rounded-2xl border border-slate-200/60 bg-white/80 p-4 shadow-sm ring-1 ring-slate-900/5 transition-shadow hover:shadow-md">
                   <div>
                     <p className="text-[0.7rem] font-bold uppercase tracking-widest text-slate-400">
@@ -129,34 +162,6 @@ export default async function QuotePage({
                       שם הפרויקט
                     </p>
                     <p className="mt-1 text-slate-700">{quote.project_name ?? "—"}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4 rounded-2xl border border-slate-200/60 bg-white/80 p-4 shadow-sm ring-1 ring-slate-900/5 transition-shadow hover:shadow-md">
-                  <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl border-2 border-white shadow-lg ring-2 ring-slate-200/80 sm:h-24 sm:w-24">
-                    {representative?.rep_avatar ? (
-                      <Image
-                        src={representative.rep_avatar}
-                        alt=""
-                        fill
-                        className="object-cover"
-                      />
-                    ) : (
-                      <DefaultAvatar />
-                    )}
-                  </div>
-                  <div>
-                    <p className="font-semibold text-slate-800">
-                      {representative?.rep_full_name ?? "—"}
-                    </p>
-                    {representative?.rep_phone && (
-                      <a
-                        href={`tel:${representative.rep_phone.replace(/\D/g, "")}`}
-                        className="mt-1 inline-flex items-center rounded-lg px-2 py-1 text-base text-slate-600 transition-colors hover:bg-slate-100 hover:text-[#801a1e] sm:min-h-[44px] sm:min-w-[44px] sm:justify-center sm:py-2 sm:text-sm"
-                        style={{ WebkitTapHighlightColor: 'transparent' }}
-                      >
-                        {representative.rep_phone}
-                      </a>
-                    )}
                   </div>
                 </div>
               </div>
@@ -184,10 +189,10 @@ export default async function QuotePage({
                   </div>
                 </div>
               </div>
-              {/* Terms on page 1 (left-aligned) */}
-              <div className="border-t border-slate-100 bg-slate-50/50 p-4 sm:p-6 md:p-8 text-left">
+              {/* Terms: headline text-right */}
+              <div className="border-t border-slate-100 bg-slate-50/50 p-4 sm:p-6 md:p-8">
                 <h3
-                  className="mb-4 text-base font-bold sm:text-lg"
+                  className="mb-4 text-right text-base font-bold sm:text-lg"
                   style={{ color: BRAND_RED }}
                 >
                   תנאי תשלום ומסחר
@@ -211,46 +216,57 @@ export default async function QuotePage({
               </div>
             </div>
 
-            {/* Product pages: contact strip top + product rows + contact strip bottom */}
+            {/* Product pages: contact strip + heading + product rows (picture + attributes) + contact strip */}
             <section className="border-t border-slate-200/80">
               <ContactStrip />
               <div className="px-4 py-6 md:px-8">
-                {/* Mobile: product rows — image block first, then details/attributes/price/status */}
-                <ul className="space-y-6 md:hidden">
+                <h2 className="mb-6 text-right text-lg font-bold text-slate-800 sm:text-xl">
+                  להלן רשימת המוצרים המשתתפים בהצעה
+                </h2>
+                {/* Product rows: image visible + attributes next to it (reference layout) */}
+                <ul className="space-y-8">
                   {products.map((p, i) => {
                     const lineTotal =
                       p.qty * (Number(p.unit_price) - Number(p.unit_discount));
+                    const attrs = getProductAttributes(p);
                     return (
                       <li
                         key={i}
-                        className="quote-card-hover rounded-2xl border border-slate-200/80 bg-white/90 shadow-md overflow-hidden ring-1 ring-slate-900/5 backdrop-blur-sm"
+                        className="quote-card-hover flex flex-col gap-4 rounded-2xl border border-slate-200/80 bg-white/90 p-4 shadow-md ring-1 ring-slate-900/5 backdrop-blur-sm md:flex-row md:items-start md:gap-6 md:p-6"
                       >
-                        <div className="flex justify-center border-b border-slate-200/80 bg-gradient-to-b from-slate-50 to-white p-5">
+                        {/* Product image — visible, one side */}
+                        <div className="flex shrink-0 justify-center md:w-64 md:justify-start">
                           <ProductImageWithLightbox
                             src={p.picture_url}
                             fill
                             className="object-contain"
-                            containerClassName="relative h-52 w-full max-w-xs overflow-hidden rounded-xl border border-slate-200/80 bg-slate-100 shadow-inner"
-                            sizes="(max-width: 384px) 100vw, 384px"
+                            containerClassName="relative h-52 w-full max-w-sm overflow-hidden rounded-xl border border-slate-200/80 bg-slate-50 shadow-inner md:h-56 md:max-w-[16rem]"
+                            sizes="(max-width: 768px) 100vw, 256px"
                           />
                         </div>
-                        <div className="p-5 text-right space-y-3">
-                          <p className="text-[0.7rem] font-bold uppercase tracking-widest text-slate-400">{p.sku ?? "—"}</p>
-                          <p className="font-semibold text-slate-800 text-lg leading-snug">
-                            {p.product_desc ?? "—"}
+                        {/* Attributes + details — other side (reference: שם המוצר: value, טכניקת אריגה: value, etc.) */}
+                        <div className="min-w-0 flex-1 text-right space-y-3">
+                          <p className="text-[0.7rem] font-bold uppercase tracking-widest text-slate-400">
+                            {p.sku ?? "—"}
                           </p>
-                          <ProductAttributesList
-                            attributes={getProductAttributes(p)}
-                            className="mt-3 rounded-xl bg-slate-50/80 p-3 border border-slate-100"
-                          />
-                          <div className="flex flex-wrap justify-end gap-x-5 gap-y-1 text-sm pt-3 border-t border-slate-100">
+                          <div className="space-y-2">
+                            <p className="leading-relaxed">
+                              <span className="font-bold text-slate-800" style={{ color: BRAND_RED }}>שם המוצר: </span>
+                              <span className="text-slate-700">{p.product_desc ?? "—"}</span>
+                            </p>
+                            {attrs.map(({ label, value }) => (
+                              <p key={label} className="leading-relaxed">
+                                <span className="font-bold text-slate-800" style={{ color: BRAND_RED }}>{label}: </span>
+                                <span className="text-slate-700">{value}</span>
+                              </p>
+                            ))}
+                          </div>
+                          <div className="flex flex-wrap justify-end gap-x-5 gap-y-1 border-t border-slate-100 pt-3 text-sm">
                             <span className="text-slate-600">כמות: <strong className="text-slate-800">{p.qty}</strong></span>
                             <span className="text-slate-600">{formatCurrency(Number(p.unit_price))} ליח׳</span>
-                            <span className="font-bold text-slate-800">
-                              {formatCurrency(lineTotal)}
-                            </span>
+                            <span className="font-bold text-slate-800">{formatCurrency(lineTotal)}</span>
                           </div>
-                          <div className="pt-4">
+                          <div className="pt-2">
                             <ApprovalStatusSelect
                               quotePublicId={publicId}
                               productSortOrder={p.sort_order}
@@ -262,91 +278,6 @@ export default async function QuotePage({
                     );
                   })}
                 </ul>
-                {/* Desktop: table — image column separate from description/price columns */}
-                <div className="hidden overflow-x-auto md:block rounded-2xl border border-slate-200/80 overflow-hidden ring-1 ring-slate-900/5 shadow-sm">
-                  <table className="w-full min-w-[720px] border-collapse text-right">
-                    <thead>
-                      <tr
-                        className="border-b-2 border-slate-200"
-                        style={{
-                          background: "linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%)",
-                        }}
-                      >
-                        <th className="py-4 px-4 text-xs font-bold uppercase tracking-wider text-slate-500">
-                          תמונה
-                        </th>
-                        <th className="py-4 px-4 text-xs font-bold uppercase tracking-wider text-slate-500">
-                          מק&quot;ט
-                        </th>
-                        <th className="py-4 px-4 text-xs font-bold uppercase tracking-wider text-slate-500">
-                          תאור מוצר
-                        </th>
-                        <th className="py-4 px-4 text-xs font-bold uppercase tracking-wider text-slate-500">
-                          כמות
-                        </th>
-                        <th className="py-4 px-4 text-xs font-bold uppercase tracking-wider text-slate-500">
-                          מחיר ליח׳
-                        </th>
-                        <th className="py-4 px-4 text-xs font-bold uppercase tracking-wider text-slate-500">
-                          סה&quot;כ
-                        </th>
-                        <th className="py-4 px-4 text-xs font-bold uppercase tracking-wider text-slate-500">
-                          סטטוס אישור
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {products.map((p, i) => {
-                        const lineTotal =
-                          p.qty *
-                          (Number(p.unit_price) - Number(p.unit_discount));
-                        return (
-                          <tr
-                            key={i}
-                            className="border-b border-slate-100 transition-colors hover:bg-slate-50/80 even:bg-slate-50/30"
-                          >
-                            <td className="py-4 px-4 align-middle">
-                              <ProductImageWithLightbox
-                                src={p.picture_url}
-                                fill
-                                className="object-cover"
-                                containerClassName="relative h-36 w-28 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-slate-100 shadow-sm ring-1 ring-slate-900/5"
-                                sizes="112px"
-                              />
-                            </td>
-                            <td className="py-4 px-4 text-sm font-medium text-slate-700">
-                              {p.sku ?? "—"}
-                            </td>
-                            <td className="py-4 px-4 align-top">
-                              <p className="font-semibold text-slate-800">
-                                {p.product_desc ?? "—"}
-                              </p>
-                              <div className="mt-2 rounded-lg bg-slate-50/80 p-2.5 border border-slate-100 w-fit max-w-sm">
-                                <ProductAttributesList
-                                  attributes={getProductAttributes(p)}
-                                />
-                              </div>
-                            </td>
-                            <td className="py-4 px-4 text-slate-700 font-medium">{p.qty}</td>
-                            <td className="py-4 px-4 text-slate-700">
-                              {formatCurrency(Number(p.unit_price))}
-                            </td>
-                            <td className="py-4 px-4 font-bold text-slate-800">
-                              {formatCurrency(lineTotal)}
-                            </td>
-                            <td className="py-4 px-4 align-top">
-                              <ApprovalStatusSelect
-                                quotePublicId={publicId}
-                                productSortOrder={p.sort_order}
-                                initialStatus={p.approval_status}
-                              />
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
               </div>
               <ContactStrip />
             </section>
