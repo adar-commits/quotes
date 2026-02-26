@@ -32,7 +32,11 @@ export async function PATCH(
   const update: Record<string, unknown> = {};
   for (const key of FIELDS) {
     if (body[key] !== undefined) {
-      update[key] = body[key] === "" ? null : body[key];
+      let val = body[key] === "" ? null : body[key];
+      if (key === "template_key" && typeof val === "string") {
+        val = val.trim().toLowerCase().replace(/\s+/g, "_");
+      }
+      update[key] = val;
     }
   }
   if (Object.keys(update).length === 0) {
