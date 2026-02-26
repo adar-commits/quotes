@@ -20,6 +20,13 @@ type Template = {
 
 const DEFAULT_COLOR = "#801a1e";
 
+/** Test quote public_id per template for Preview button */
+const TEMPLATE_PREVIEW_PUBLIC_IDS: Record<string, string> = {
+  redcarpet: "test-redcarpet",
+  pozitive: "test-pozitive",
+  elite_rugs: "test-elite",
+};
+
 export default function SettingsPage() {
   const router = useRouter();
   const [templates, setTemplates] = useState<Template[]>([]);
@@ -477,7 +484,17 @@ function TemplateForm({
             {t.id}
           </code>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          {TEMPLATE_PREVIEW_PUBLIC_IDS[t.template_key] && (
+            <a
+              href={`${typeof window !== "undefined" ? (process.env.NEXT_PUBLIC_APP_URL || window.location.origin) : process.env.NEXT_PUBLIC_APP_URL || ""}/${TEMPLATE_PREVIEW_PUBLIC_IDS[t.template_key]}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs font-medium text-slate-600 hover:bg-slate-100"
+            >
+              Preview
+            </a>
+          )}
           <button
             type="button"
             onClick={copyId}
