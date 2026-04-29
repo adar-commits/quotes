@@ -99,27 +99,27 @@ export default function QuoteProductsTable({
   return (
     <>
       <div className="overflow-x-auto border-t border-slate-200/80">
-        <table className="w-full min-w-[500px] border-collapse text-right">
+        <table className="w-full min-w-[500px] border-collapse [&_td]:text-right [&_th]:text-right">
           <thead>
             <tr
               className="border-b-2 border-slate-200 text-white"
               style={{ backgroundColor: mainColor }}
             >
-              <th className="py-3 px-3">
+              <th className="px-3 py-3 text-right align-bottom">
                 <button
                   type="button"
                   onClick={() => toggleSort("sku")}
-                  className="w-full text-xs font-bold uppercase tracking-wider underline-offset-2 hover:underline"
+                  className="inline-flex w-full items-center justify-end gap-1 text-xs font-bold uppercase tracking-wider underline-offset-2 hover:underline"
                 >
                   מק&quot;ט
                   {sortKey === "sku" ? (sortDir === "asc" ? " ↑" : " ↓") : ""}
                 </button>
               </th>
-              <th className="py-3 px-3">
+              <th className="px-3 py-3 text-right align-bottom">
                 <button
                   type="button"
                   onClick={() => toggleSort("product_desc")}
-                  className="w-full text-xs font-bold uppercase tracking-wider underline-offset-2 hover:underline"
+                  className="inline-flex w-full items-center justify-end gap-1 text-xs font-bold uppercase tracking-wider underline-offset-2 hover:underline"
                 >
                   תאור מוצר
                   {sortKey === "product_desc"
@@ -129,11 +129,11 @@ export default function QuoteProductsTable({
                     : ""}
                 </button>
               </th>
-              <th className="py-3 px-3">
+              <th className="px-3 py-3 text-right align-bottom">
                 <button
                   type="button"
                   onClick={() => toggleSort("qty")}
-                  className="w-full text-xs font-bold uppercase tracking-wider underline-offset-2 hover:underline"
+                  className="inline-flex w-full items-center justify-end gap-1 text-xs font-bold uppercase tracking-wider underline-offset-2 hover:underline"
                 >
                   כמות
                   {sortKey === "qty"
@@ -143,11 +143,11 @@ export default function QuoteProductsTable({
                     : ""}
                 </button>
               </th>
-              <th className="py-3 px-3">
+              <th className="px-3 py-3 text-right align-bottom">
                 <button
                   type="button"
                   onClick={() => toggleSort("unit_price")}
-                  className="w-full text-xs font-bold uppercase tracking-wider underline-offset-2 hover:underline"
+                  className="inline-flex w-full items-center justify-end gap-1 text-xs font-bold uppercase tracking-wider underline-offset-2 hover:underline"
                 >
                   מחיר ליחידה
                   {sortKey === "unit_price"
@@ -157,11 +157,11 @@ export default function QuoteProductsTable({
                     : ""}
                 </button>
               </th>
-              <th className="py-3 px-3">
+              <th className="px-3 py-3 text-right align-bottom">
                 <button
                   type="button"
                   onClick={() => toggleSort("line_total")}
-                  className="w-full text-xs font-bold uppercase tracking-wider underline-offset-2 hover:underline"
+                  className="inline-flex w-full items-center justify-end gap-1 text-xs font-bold uppercase tracking-wider underline-offset-2 hover:underline"
                 >
                   סה&quot;כ
                   {sortKey === "line_total"
@@ -179,18 +179,23 @@ export default function QuoteProductsTable({
                 key={`${p.sort_order}-${i}`}
                 className={`border-b border-slate-100 ${i % 2 === 1 ? "bg-slate-50/80" : ""}`}
               >
-                <td className="py-3 px-3 text-sm text-slate-700">
+                <td className="px-3 py-3 text-right text-sm text-slate-700 align-top">
                   {p.sku ?? "—"}
                 </td>
-                <td className="py-3 px-3 text-sm text-slate-700">
+                <td className="px-3 py-3 text-right text-sm text-slate-700 align-top">
                   {p.product_desc ?? "—"}
                 </td>
-                <td className="py-3 px-3 text-sm text-slate-700">{p.qty}</td>
-                <td className="py-3 px-3 text-sm text-slate-700" dir="ltr">
+                <td className="px-3 py-3 text-right text-sm text-slate-700 align-top tabular-nums">
+                  {p.qty}
+                </td>
+                <td
+                  className="px-3 py-3 text-right text-sm text-slate-700 align-top tabular-nums"
+                  dir="ltr"
+                >
                   {formatCurrency(Number(p.unit_price))}
                 </td>
                 <td
-                  className="py-3 px-3 text-sm font-semibold text-slate-800"
+                  className="px-3 py-3 text-right text-sm font-semibold text-slate-800 align-top tabular-nums"
                   dir="ltr"
                 >
                   {formatCurrency(p.lineTotal)}

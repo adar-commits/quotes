@@ -115,34 +115,18 @@ export default async function QuotePage({
             {/* Page 1: Chart only — banner + customer/salesperson (right) + quote details + financial summary */}
             <div className="border-b border-slate-200/60">
               <QuoteBanner bannerUrl={template?.banner_url} />
-              <div className="grid grid-cols-1 gap-6 border-t border-slate-200/80 bg-gradient-to-b from-slate-50/90 to-white p-4 backdrop-blur-sm sm:p-6 md:grid-cols-3 md:p-8">
-                {/* Col 1 (rightmost in RTL): שם לקוח */}
-                <div className="rounded-2xl border border-slate-200/60 bg-white/80 p-4 text-right shadow-sm ring-1 ring-slate-900/5 transition-shadow hover:shadow-md">
+              {/* LTR column order: left = מפיק, middle = פרטי הצעה, right = שם לקוח — text ~110% of previous text-xs */}
+              <div
+                className="grid grid-cols-1 gap-6 border-t border-slate-200/80 bg-gradient-to-b from-slate-50/90 to-white p-4 backdrop-blur-sm sm:p-6 md:grid-cols-3 md:p-8"
+                dir="ltr"
+              >
+                {/* Col 1 (screen left): מפיק ההצעה */}
+                <div
+                  className="rounded-2xl border border-slate-200/60 bg-white/80 p-4 text-right shadow-sm ring-1 ring-slate-900/5 transition-shadow hover:shadow-md"
+                  dir="rtl"
+                >
                   <p
-                    className="text-xs font-normal uppercase tracking-wider"
-                    style={{ color: mainColor }}
-                  >
-                    שם לקוח
-                  </p>
-                  <p className="mt-1 text-xs font-normal text-slate-700">
-                    {(customer?.customer_name || customer?.customer_id) ?? "—"}
-                  </p>
-                  {customer?.customer_logo && (
-                    <div className="mt-3 relative ml-auto h-16 w-auto max-w-[140px] aspect-[2/1] overflow-hidden rounded-lg border border-slate-200/80 bg-slate-50">
-                      <Image
-                        src={customer.customer_logo}
-                        alt=""
-                        fill
-                        className="object-contain object-right"
-                        sizes="140px"
-                      />
-                    </div>
-                  )}
-                </div>
-                {/* Col 2 (middle): מפיק ההצעה — title, square avatar, name, phone */}
-                <div className="rounded-2xl border border-slate-200/60 bg-white/80 p-4 text-right shadow-sm ring-1 ring-slate-900/5 transition-shadow hover:shadow-md">
-                  <p
-                    className="text-xs font-normal uppercase tracking-wider"
+                    className="text-[0.825rem] font-normal uppercase leading-snug tracking-wider"
                     style={{ color: mainColor }}
                   >
                     מפיק ההצעה
@@ -160,29 +144,32 @@ export default async function QuotePage({
                       sizes="96px"
                     />
                   </div>
-                  <p className="mt-2 text-xs font-normal text-slate-700">
+                  <p className="mt-2 text-[0.825rem] font-normal leading-snug text-slate-700">
                     {representative?.rep_full_name ?? "—"}
                   </p>
                   {representative?.rep_phone && (
                     <a
                       href={`tel:${representative.rep_phone.replace(/\D/g, "")}`}
-                      className="mt-1 inline-flex rounded-lg px-1 py-1 text-xs font-normal text-slate-600 transition-colors hover:bg-slate-100 hover:opacity-90 sm:min-h-[44px] sm:min-w-[44px] sm:items-center sm:justify-center sm:py-2"
+                      className="mt-1 inline-flex rounded-lg px-1 py-1 text-[0.825rem] font-normal leading-snug text-slate-600 transition-colors hover:bg-slate-100 hover:opacity-90 sm:min-h-[44px] sm:min-w-[44px] sm:items-center sm:justify-center sm:py-2"
                       style={{ WebkitTapHighlightColor: "transparent" }}
                     >
                       {representative.rep_phone}
                     </a>
                   )}
                 </div>
-                {/* Col 3 (left in RTL): Quote #, date, project */}
-                <div className="space-y-3 rounded-2xl border border-slate-200/60 bg-white/80 p-4 text-right shadow-sm ring-1 ring-slate-900/5 transition-shadow hover:shadow-md">
+                {/* Col 2 (middle): מס׳ הצעה, תאריך, פרויקט */}
+                <div
+                  className="space-y-3 rounded-2xl border border-slate-200/60 bg-white/80 p-4 text-right shadow-sm ring-1 ring-slate-900/5 transition-shadow hover:shadow-md"
+                  dir="rtl"
+                >
                   <div>
                     <p
-                      className="text-xs font-normal uppercase tracking-wider"
+                      className="text-[0.825rem] font-normal uppercase leading-snug tracking-wider"
                       style={{ color: mainColor }}
                     >
                       מס׳ הצעה
                     </p>
-                    <p className="mt-1 text-xs font-normal text-slate-700">
+                    <p className="mt-1 text-[0.825rem] font-normal leading-snug text-slate-700">
                       {quote.public_id
                         ? quote.public_id.slice(-10)
                         : quote.quotation_id ?? quote.invoice_id ?? "—"}
@@ -190,26 +177,52 @@ export default async function QuotePage({
                   </div>
                   <div>
                     <p
-                      className="text-xs font-normal uppercase tracking-wider"
+                      className="text-[0.825rem] font-normal uppercase leading-snug tracking-wider"
                       style={{ color: mainColor }}
                     >
                       תאריך הפקה
                     </p>
-                    <p className="mt-1 text-xs font-normal text-slate-700">
+                    <p className="mt-1 text-[0.825rem] font-normal leading-snug text-slate-700">
                       {formatDate(quote.invoice_creation_date)}
                     </p>
                   </div>
                   <div>
                     <p
-                      className="text-xs font-normal uppercase tracking-wider"
+                      className="text-[0.825rem] font-normal uppercase leading-snug tracking-wider"
                       style={{ color: mainColor }}
                     >
                       שם הפרויקט
                     </p>
-                    <p className="mt-1 text-xs font-normal text-slate-700">
+                    <p className="mt-1 text-[0.825rem] font-normal leading-snug text-slate-700">
                       {quote.project_name ?? "—"}
                     </p>
                   </div>
+                </div>
+                {/* Col 3 (screen right): שם לקוח */}
+                <div
+                  className="rounded-2xl border border-slate-200/60 bg-white/80 p-4 text-right shadow-sm ring-1 ring-slate-900/5 transition-shadow hover:shadow-md"
+                  dir="rtl"
+                >
+                  <p
+                    className="text-[0.825rem] font-normal uppercase leading-snug tracking-wider"
+                    style={{ color: mainColor }}
+                  >
+                    שם לקוח
+                  </p>
+                  <p className="mt-1 text-[0.825rem] font-normal leading-snug text-slate-700">
+                    {(customer?.customer_name || customer?.customer_id) ?? "—"}
+                  </p>
+                  {customer?.customer_logo && (
+                    <div className="mt-3 relative ml-auto h-16 w-auto max-w-[140px] aspect-[2/1] overflow-hidden rounded-lg border border-slate-200/80 bg-slate-50">
+                      <Image
+                        src={customer.customer_logo}
+                        alt=""
+                        fill
+                        className="object-contain object-right"
+                        sizes="140px"
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
               <QuoteProductsTable
