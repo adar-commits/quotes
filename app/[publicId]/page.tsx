@@ -140,35 +140,66 @@ export default async function QuotePage({
                           sizes="96px"
                         />
                       </div>
-                      <p className="mt-2 text-[0.825rem] font-normal leading-snug text-slate-700">
-                        {representative?.rep_full_name ?? "—"}
-                      </p>
-                      {(representative?.rep_email?.trim() ||
-                        representative?.rep_phone) && (
-                        <div
-                          className="mt-2 flex flex-wrap items-center justify-end gap-x-4 gap-y-1 text-[0.825rem]"
-                          dir="ltr"
-                        >
-                          {representative?.rep_email?.trim() ? (
-                            <a
-                              href={`mailto:${representative.rep_email.trim()}`}
-                              className="rounded-lg px-1 py-1 font-normal leading-snug text-slate-600 transition-colors hover:bg-slate-100 hover:opacity-90"
-                              style={{ WebkitTapHighlightColor: "transparent" }}
+                      <div className="mt-3 space-y-2 text-[0.825rem] leading-snug">
+                        <p>
+                          <span
+                            className="font-medium"
+                            style={{ color: mainColor }}
+                          >
+                            שם:{" "}
+                          </span>
+                          <span className="text-slate-700">
+                            {representative?.rep_full_name ?? "—"}
+                          </span>
+                        </p>
+                        {quote.agent_desc?.trim() ? (
+                          <p>
+                            <span
+                              className="font-medium"
+                              style={{ color: mainColor }}
                             >
-                              {representative.rep_email.trim()}
-                            </a>
-                          ) : null}
-                          {representative?.rep_phone ? (
+                              תפקיד:{" "}
+                            </span>
+                            <span className="text-slate-700">
+                              {quote.agent_desc.trim()}
+                            </span>
+                          </p>
+                        ) : null}
+                        {representative?.rep_phone ? (
+                          <p>
+                            <span
+                              className="font-medium"
+                              style={{ color: mainColor }}
+                            >
+                              טלפון:{" "}
+                            </span>
                             <a
                               href={`tel:${representative.rep_phone.replace(/\D/g, "")}`}
-                              className="rounded-lg px-1 py-1 font-normal leading-snug text-slate-600 transition-colors hover:bg-slate-100 hover:opacity-90 sm:min-h-[44px] sm:min-w-[44px] sm:inline-flex sm:items-center sm:justify-center sm:py-2"
+                              className="text-slate-700 underline-offset-2 transition-colors hover:text-slate-900 hover:underline"
                               style={{ WebkitTapHighlightColor: "transparent" }}
                             >
                               {representative.rep_phone}
                             </a>
-                          ) : null}
-                        </div>
-                      )}
+                          </p>
+                        ) : null}
+                        {representative?.rep_email?.trim() ? (
+                          <p>
+                            <span
+                              className="font-medium"
+                              style={{ color: mainColor }}
+                            >
+                              דוא&quot;ל:{" "}
+                            </span>
+                            <a
+                              href={`mailto:${representative.rep_email.trim()}`}
+                              className="text-slate-700 underline-offset-2 transition-colors hover:text-slate-900 hover:underline"
+                              style={{ WebkitTapHighlightColor: "transparent" }}
+                            >
+                              {representative.rep_email.trim()}
+                            </a>
+                          </p>
+                        ) : null}
+                      </div>
                     </div>
                     <div className="space-y-4 text-right">
                       <div>
@@ -270,9 +301,11 @@ export default async function QuotePage({
             <section className="border-t border-slate-200/80">
               <ContactStrip mainColor={template?.main_color ?? template?.contact_strip_bg} />
               <div className="px-4 py-6 md:px-8">
-                <h2 className="mb-6 text-right text-lg font-bold text-slate-800 sm:text-xl">
-                  להלן רשימת המוצרים המשתתפים בהצעה
-                </h2>
+                <div className="mb-6 rounded-2xl border border-slate-200/60 bg-white/85 px-4 py-4 shadow-sm ring-1 ring-slate-900/5 sm:px-6 sm:py-5">
+                  <h2 className="text-right text-lg font-bold text-slate-800 sm:text-xl">
+                    להלן רשימת המוצרים המשתתפים בהצעה
+                  </h2>
+                </div>
                 {/* Product rows: image visible + attributes next to it (reference layout) */}
                 <ul className="space-y-8">
                   {products.map((p, i) => {
@@ -298,18 +331,25 @@ export default async function QuotePage({
                         </div>
                         {/* Strip → attributes → separator */}
                         <div className="min-w-0 flex-1 space-y-4 text-right md:max-w-[55%]">
-                          <div className="flex flex-wrap items-center justify-end gap-x-4 gap-y-3 border-b border-slate-200 pb-3 text-sm">
-                            <span className="text-slate-600">
-                              כמות:{" "}
-                              <strong className="text-slate-800">{p.qty}</strong>
-                            </span>
-                            <span className="text-slate-600">
-                              {formatCurrency(Number(p.unit_price))} ליח׳
-                            </span>
-                            <span className="font-bold text-slate-800">
-                              {formatCurrency(lineTotal)}
-                            </span>
-                            <div className="w-fit shrink-0">
+                          <div
+                            className="flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-3 text-sm"
+                            dir="rtl"
+                          >
+                            <div className="flex flex-wrap items-center justify-end gap-x-4 gap-y-2">
+                              <span className="text-slate-600">
+                                כמות:{" "}
+                                <strong className="text-slate-800">
+                                  {p.qty}
+                                </strong>
+                              </span>
+                              <span className="text-slate-600">
+                                {formatCurrency(Number(p.unit_price))} ליח׳
+                              </span>
+                              <span className="font-bold text-slate-800">
+                                {formatCurrency(lineTotal)}
+                              </span>
+                            </div>
+                            <div className="shrink-0">
                               <ApprovalStatusSelect
                                 quotePublicId={publicId}
                                 productSortOrder={p.sort_order}

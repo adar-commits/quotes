@@ -101,7 +101,8 @@ export default function QuoteProductsTable({
       <div className="overflow-x-auto border-t border-slate-200/80" dir="rtl">
         <table className="w-full min-w-[500px] table-fixed border-collapse">
           <colgroup>
-            <col className="w-[12%]" />
+            {/* מק״ט: +30% vs prior 12% → ~15.6% */}
+            <col className="w-[15.6%]" />
             <col />
             <col className="w-[8%]" />
             <col className="w-[14%]" />
