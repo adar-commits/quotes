@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { calculateQuoteBreakdown } from "@/lib/quote-total";
 import { getQuoteByPublicId } from "@/lib/quotes-db";
 import QuoteSignature from "./QuoteSignature";
 import QuoteReveal from "./QuoteReveal";
@@ -83,14 +84,15 @@ export default async function QuotePage({
   const mainColor = template?.main_color ?? DEFAULT_MAIN;
   const bulletsColor = template?.bullets_color ?? mainColor;
 
-  const subtotal = products.reduce(
-    (sum, p) => sum + p.qty * (Number(p.unit_price) - Number(p.unit_discount)),
-    0
-  );
-  const afterDiscount = subtotal - Number(quote.special_discount);
-  const vatRate = Number(quote.vat) / 100;
-  const vatAmount = afterDiscount * vatRate;
-  const total = afterDiscount + vatAmount;
+  const { subtotal, vatAmount, total } = calculateQuoteBreakdown({
+    vat: Number(quote.vat),
+    specialDiscount: Number(quote.special_discount),
+    lines: products.map((p) => ({
+      qty: p.qty,
+      unitPrice: Number(p.unit_price),
+      unitDiscount: Number(p.unit_discount),
+    })),
+  });
 
   return (
     <QuoteReveal>

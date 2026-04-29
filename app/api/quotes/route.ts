@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServiceRoleClient } from "@/lib/supabase-server";
+import { calculateQuoteBreakdown } from "@/lib/quote-total";
 import type { QuotationPayload } from "@/lib/quotation-types";
 
 function parseInvoiceDate(value: string): string | null {
@@ -198,10 +199,24 @@ export async function POST(request: NextRequest) {
     request.nextUrl.origin;
   const url = `${baseUrl}/${publicId}`;
 
+  const productLines = (Array.isArray(q.products) ? q.products : []).map(
+    (p) => ({
+      qty: p.Qty ?? 0,
+      unitPrice: p.unitPrice ?? 0,
+      unitDiscount: p.unitDiscount ?? 0,
+    })
+  );
+  const { total } = calculateQuoteBreakdown({
+    vat: q.vat,
+    specialDiscount: q.specialDiscount ?? 0,
+    lines: productLines,
+  });
+
   return NextResponse.json({
     public_id: publicId,
     quote_id: quoteId,
     template_id: templateId ?? undefined,
     url,
+    total,
   });
 }
