@@ -56,7 +56,7 @@ export default function ProductImageWithLightbox({
         className={`block text-left w-full h-full min-h-[120px] ${containerClassName ?? ""}`}
         aria-label="הגדל תמונה"
       >
-        <div className="relative h-full w-full overflow-hidden rounded-xl bg-white transition-transform hover:scale-[1.02]">
+        <div className="relative min-h-[11rem] h-full w-full overflow-hidden rounded-xl bg-white transition-transform hover:scale-[1.02] md:min-h-0">
           <Image
             src={src}
             alt={alt}
@@ -65,6 +65,7 @@ export default function ProductImageWithLightbox({
             height={height}
             className={className ?? "object-contain"}
             sizes={sizes}
+            unoptimized
           />
         </div>
       </button>
@@ -99,7 +100,7 @@ export default function ProductImageWithLightbox({
               height={900}
               className="max-h-[90vh] w-auto object-contain rounded-lg shadow-2xl"
               sizes="(max-width: 1024px) 100vw, 1024px"
-              unoptimized={false}
+              unoptimized
             />
           </div>
         </div>

@@ -98,22 +98,24 @@ export default function QuoteProductsTable({
 
   return (
     <>
-      <div className="overflow-x-auto border-t border-slate-200/80" dir="rtl">
-        <table className="w-full min-w-[500px] table-fixed border-collapse">
+      <div
+        className="-mx-1 overflow-x-auto overscroll-x-contain border-t border-slate-200/80 px-1 pb-1 [-webkit-overflow-scrolling:touch]"
+        dir="rtl"
+      >
+        <table className="w-max min-w-[920px] border-collapse md:w-full md:min-w-0 md:table-fixed">
           <colgroup>
-            {/* מק״ט: +30% vs prior 12% → ~15.6% */}
-            <col className="w-[15.6%]" />
+            <col style={{ width: "15.6%" }} />
             <col />
-            <col className="w-[8%]" />
-            <col className="w-[14%]" />
-            <col className="w-[14%]" />
+            <col style={{ width: "9%" }} />
+            <col style={{ width: "15%" }} />
+            <col style={{ width: "15%" }} />
           </colgroup>
           <thead>
             <tr
               className="border-b-2 border-slate-200 text-white"
               style={{ backgroundColor: mainColor }}
             >
-              <th className="px-3 py-3 text-right align-bottom">
+              <th className="px-2 py-3 text-right align-bottom md:px-3">
                 <button
                   type="button"
                   onClick={() => toggleSort("sku")}
@@ -123,7 +125,7 @@ export default function QuoteProductsTable({
                   {sortKey === "sku" ? (sortDir === "asc" ? " ↑" : " ↓") : ""}
                 </button>
               </th>
-              <th className="px-3 py-3 text-right align-bottom">
+              <th className="px-2 py-3 text-right align-bottom md:px-3">
                 <button
                   type="button"
                   onClick={() => toggleSort("product_desc")}
@@ -137,7 +139,7 @@ export default function QuoteProductsTable({
                     : ""}
                 </button>
               </th>
-              <th className="px-3 py-3 text-right align-bottom">
+              <th className="px-2 py-3 text-right align-bottom md:px-3">
                 <button
                   type="button"
                   onClick={() => toggleSort("qty")}
@@ -151,7 +153,7 @@ export default function QuoteProductsTable({
                     : ""}
                 </button>
               </th>
-              <th className="px-3 py-3 text-right align-bottom">
+              <th className="px-2 py-3 text-right align-bottom md:px-3">
                 <button
                   type="button"
                   onClick={() => toggleSort("unit_price")}
@@ -165,7 +167,7 @@ export default function QuoteProductsTable({
                     : ""}
                 </button>
               </th>
-              <th className="px-3 py-3 text-right align-bottom">
+              <th className="px-2 py-3 text-right align-bottom md:px-3">
                 <button
                   type="button"
                   onClick={() => toggleSort("line_total")}
@@ -187,23 +189,23 @@ export default function QuoteProductsTable({
                 key={`${p.sort_order}-${i}`}
                 className={`border-b border-slate-100 ${i % 2 === 1 ? "bg-slate-50/80" : ""}`}
               >
-                <td className="px-3 py-3 text-right text-sm text-slate-700 align-top">
-                  {p.sku ?? "—"}
+                <td className="max-w-[min(28vw,11rem)] px-2 py-3 text-right text-sm text-slate-700 align-top md:max-w-none md:px-3">
+                  <span className="break-all">{p.sku ?? "—"}</span>
                 </td>
-                <td className="px-3 py-3 text-right text-sm text-slate-700 align-top">
-                  {p.product_desc ?? "—"}
+                <td className="min-w-[12rem] max-w-[42vw] px-2 py-3 text-right text-sm text-slate-700 align-top md:max-w-none md:px-3">
+                  <span className="break-words">{p.product_desc ?? "—"}</span>
                 </td>
-                <td className="px-3 py-3 text-right text-sm text-slate-700 align-top tabular-nums">
+                <td className="whitespace-nowrap px-2 py-3 text-right text-sm text-slate-700 align-top tabular-nums md:px-3">
                   {p.qty}
                 </td>
                 <td
-                  className="px-3 py-3 text-right text-sm text-slate-700 align-top tabular-nums"
+                  className="whitespace-nowrap px-2 py-3 text-right text-sm text-slate-700 align-top tabular-nums md:px-3"
                   dir="ltr"
                 >
                   {formatCurrency(Number(p.unit_price))}
                 </td>
                 <td
-                  className="px-3 py-3 text-right text-sm font-semibold text-slate-800 align-top tabular-nums"
+                  className="whitespace-nowrap px-2 py-3 text-right text-sm font-semibold text-slate-800 align-top tabular-nums md:px-3"
                   dir="ltr"
                 >
                   {formatCurrency(p.lineTotal)}
@@ -214,46 +216,48 @@ export default function QuoteProductsTable({
         </table>
       </div>
       <div
-        className="relative flex flex-col gap-6 px-4 py-6 text-white sm:flex-row sm:flex-wrap sm:items-start sm:justify-between sm:gap-4 md:px-8"
+        className="relative flex flex-col items-center justify-center gap-0 px-4 py-5 text-white md:flex-row md:flex-wrap md:items-start md:justify-between md:gap-4 md:px-8"
         style={{
           background: `linear-gradient(135deg, ${mainColor} 0%, ${mainColor}dd 100%)`,
           boxShadow:
             "inset 0 1px 0 rgba(255,255,255,0.08), 0 4px 12px rgba(0,0,0,0.1)",
         }}
-        dir="ltr"
+        dir="rtl"
       >
-        {/* Visual LTR left → right: סה״כ לתשלום | מע״מ | הנחה (opt) | סה״כ ללא מע״מ */}
-        <div className="flex flex-col gap-4 text-right sm:flex-row sm:flex-wrap sm:gap-8 md:gap-12">
-          <div className="text-right">
-            <p className="text-sm font-medium opacity-90">סה&quot;כ לתשלום</p>
-            <p className="text-xl font-bold sm:text-2xl">
-              {formatCurrency(total)}
+        {/* Mobile: center stack; סה״כ לתשלום last. Desktop: row remains readable */}
+        <div className="flex w-full max-w-md flex-col items-center gap-3 text-center md:max-w-none md:flex-row md:flex-wrap md:items-start md:justify-between md:gap-8 md:text-right">
+          <div className="md:text-right">
+            <p className="text-xs font-medium opacity-90 sm:text-sm">
+              סה&quot;כ ללא מע&quot;מ
             </p>
-          </div>
-          <div className="text-right">
-            <p className="text-sm font-medium opacity-90">
-              מע&quot;מ ({quoteVat}%)
-            </p>
-            <p className="text-base font-bold sm:text-lg">
-              {formatCurrency(vatAmount)}
+            <p className="text-sm font-bold tabular-nums sm:text-base">
+              {formatCurrency(lineSubtotal)}
             </p>
           </div>
           {showSpecial && (
-            <div className="text-right">
-              <p className="text-sm font-medium opacity-90">
+            <div className="md:text-right">
+              <p className="text-xs font-medium opacity-90 sm:text-sm">
                 הנחה מיוחדת ({specialDiscountPercent}%)
               </p>
-              <p className="text-base font-bold sm:text-lg">
+              <p className="text-sm font-bold tabular-nums sm:text-base">
                 {formatCurrency(specialDiscountAmount)}
               </p>
             </div>
           )}
-          <div className="text-right">
-            <p className="text-sm font-medium opacity-90">
-              סה&quot;כ ללא מע&quot;מ
+          <div className="md:text-right">
+            <p className="text-xs font-medium opacity-90 sm:text-sm">
+              מע&quot;מ ({quoteVat}%)
             </p>
-            <p className="text-base font-bold sm:text-lg">
-              {formatCurrency(lineSubtotal)}
+            <p className="text-sm font-bold tabular-nums sm:text-base">
+              {formatCurrency(vatAmount)}
+            </p>
+          </div>
+          <div className="mt-1 w-full border-t border-white/25 pt-3 md:mt-0 md:w-auto md:border-t-0 md:pt-0">
+            <p className="text-xs font-medium opacity-90 sm:text-sm">
+              סה&quot;כ לתשלום
+            </p>
+            <p className="text-base font-bold tabular-nums sm:text-lg md:text-xl">
+              {formatCurrency(total)}
             </p>
           </div>
         </div>

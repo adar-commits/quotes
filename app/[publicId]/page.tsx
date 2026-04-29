@@ -317,20 +317,24 @@ export default async function QuotePage({
                         key={i}
                         className="quote-card-hover flex flex-col gap-4 rounded-2xl border border-slate-200/80 bg-white/90 p-4 shadow-md ring-1 ring-slate-900/5 backdrop-blur-sm md:flex-row md:items-start md:gap-6 md:p-6"
                       >
-                        {/* Product image + SKU below (theme red) — narrower column to give +10% to text */}
-                        <div className="flex w-full shrink-0 flex-col items-center md:w-[20.24rem] md:max-w-[34.5%]">
-                          <div className="w-full">
-                            <ProductImageWithLightbox
-                              src={p.picture_url}
-                              fill
-                              className="object-contain"
-                              containerClassName="relative mx-auto h-[16.56rem] w-full max-w-[22.08rem] overflow-hidden rounded-xl bg-white md:h-[22.08rem] md:max-w-none"
-                              sizes="(max-width: 768px) 100vw, 414px"
+                        <div className="hidden w-full shrink-0 md:block md:w-[20.24rem] md:max-w-[34.5%]">
+                          <ProductImageWithLightbox
+                            src={p.picture_url}
+                            fill
+                            className="object-contain"
+                            containerClassName="relative mx-auto h-[16.56rem] w-full max-w-[22.08rem] overflow-hidden rounded-xl bg-white md:h-[22.08rem] md:max-w-none"
+                            sizes="(max-width: 768px) 100vw, 414px"
+                          />
+                        </div>
+                        <div className="flex min-w-0 flex-1 flex-col gap-4 text-right md:max-w-[55%]">
+                          <div className="flex justify-end md:hidden">
+                            <ApprovalStatusSelect
+                              quotePublicId={publicId}
+                              productSortOrder={p.sort_order}
+                              initialStatus={p.approval_status}
+                              mainColor={template?.main_color}
                             />
                           </div>
-                        </div>
-                        {/* Strip → attributes → separator */}
-                        <div className="min-w-0 flex-1 space-y-4 text-right md:max-w-[55%]">
                           <div
                             className="flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-3 text-sm"
                             dir="rtl"
@@ -349,7 +353,7 @@ export default async function QuotePage({
                                 {formatCurrency(lineTotal)}
                               </span>
                             </div>
-                            <div className="shrink-0">
+                            <div className="hidden shrink-0 md:block">
                               <ApprovalStatusSelect
                                 quotePublicId={publicId}
                                 productSortOrder={p.sort_order}
@@ -357,6 +361,15 @@ export default async function QuotePage({
                                 mainColor={template?.main_color}
                               />
                             </div>
+                          </div>
+                          <div className="w-full md:hidden">
+                            <ProductImageWithLightbox
+                              src={p.picture_url}
+                              fill
+                              className="object-contain"
+                              containerClassName="relative mx-auto h-[16.56rem] w-full max-w-[22.08rem] overflow-hidden rounded-xl bg-white"
+                              sizes="(max-width: 768px) 100vw, 414px"
+                            />
                           </div>
                           <div className="space-y-2">
                             {p.sku?.trim() ? (
