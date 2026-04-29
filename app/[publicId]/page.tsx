@@ -274,31 +274,28 @@ export default async function QuotePage({
                         key={i}
                         className="quote-card-hover flex flex-col gap-4 rounded-2xl border border-slate-200/80 bg-white/90 p-4 shadow-md ring-1 ring-slate-900/5 backdrop-blur-sm md:flex-row md:items-start md:gap-6 md:p-6"
                       >
-                        {/* Product image — larger */}
-                        <div className="flex shrink-0 justify-center md:w-[28rem] md:justify-start">
-                          <ProductImageWithLightbox
-                            src={p.picture_url}
-                            fill
-                            className="object-contain"
-                            containerClassName="relative h-72 w-full max-w-sm overflow-hidden rounded-xl bg-slate-50/80 md:h-96 md:max-w-none"
-                            sizes="(max-width: 768px) 100vw, 448px"
-                          />
-                        </div>
-                        {/* Attributes + details — סטטוס אישור top-left (first), then rest */}
-                        <div className="min-w-0 flex-1 text-right space-y-3 md:max-w-[45%]">
-                          <div className="w-fit">
-                            <ApprovalStatusSelect
-                              quotePublicId={publicId}
-                              productSortOrder={p.sort_order}
-                              initialStatus={p.approval_status}
-                              mainColor={template?.main_color}
+                        {/* Product image + SKU below (theme red) — narrower column to give +10% to text */}
+                        <div className="flex w-full shrink-0 flex-col items-center md:w-[22rem] md:max-w-[38%]">
+                          <div className="w-full">
+                            <ProductImageWithLightbox
+                              src={p.picture_url}
+                              fill
+                              className="object-contain"
+                              containerClassName="relative mx-auto h-72 w-full max-w-sm overflow-hidden rounded-xl bg-slate-50/80 md:h-96 md:max-w-none"
+                              sizes="(max-width: 768px) 100vw, 448px"
                             />
                           </div>
                           {p.sku?.trim() ? (
-                            <p className="text-[0.7rem] font-bold uppercase tracking-widest text-slate-400">
+                            <p
+                              className="mt-3 text-center text-sm font-semibold uppercase tracking-wide"
+                              style={{ color: mainColor }}
+                            >
                               {p.sku}
                             </p>
                           ) : null}
+                        </div>
+                        {/* Attributes + pricing row with סטטוס אישור */}
+                        <div className="min-w-0 flex-1 space-y-3 text-right md:max-w-[55%]">
                           <div className="space-y-2">
                             {p.product_desc?.trim() ? (
                               <p className="leading-relaxed">
@@ -319,10 +316,24 @@ export default async function QuotePage({
                               </p>
                             ) : null}
                           </div>
-                          <div className="flex flex-wrap justify-end gap-x-5 gap-y-1 border-t border-slate-100 pt-3 text-sm">
-                            <span className="text-slate-600">כמות: <strong className="text-slate-800">{p.qty}</strong></span>
-                            <span className="text-slate-600">{formatCurrency(Number(p.unit_price))} ליח׳</span>
-                            <span className="font-bold text-slate-800">{formatCurrency(lineTotal)}</span>
+                          <div className="flex flex-wrap items-center justify-end gap-x-4 gap-y-3 border-t border-slate-100 pt-3 text-sm">
+                            <span className="text-slate-600">
+                              כמות: <strong className="text-slate-800">{p.qty}</strong>
+                            </span>
+                            <span className="text-slate-600">
+                              {formatCurrency(Number(p.unit_price))} ליח׳
+                            </span>
+                            <span className="font-bold text-slate-800">
+                              {formatCurrency(lineTotal)}
+                            </span>
+                            <div className="w-fit shrink-0">
+                              <ApprovalStatusSelect
+                                quotePublicId={publicId}
+                                productSortOrder={p.sort_order}
+                                initialStatus={p.approval_status}
+                                mainColor={template?.main_color}
+                              />
+                            </div>
                           </div>
                         </div>
                       </li>
