@@ -8,6 +8,7 @@ import QuoteReveal from "./QuoteReveal";
 import ApprovalStatusSelect from "./ApprovalStatusSelect";
 import ContactStrip from "./ContactStrip";
 import ProductImageWithLightbox from "./ProductImageWithLightbox";
+import QuoteBanner from "./QuoteBanner";
 
 const DEFAULT_MAIN = "#801a1e";
 
@@ -112,6 +113,7 @@ export default async function QuotePage({
           <div className="overflow-hidden rounded-3xl border border-white/40 bg-white/90 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] ring-1 ring-black/5 backdrop-blur-xl">
             {/* Page 1: Chart only — banner + customer/salesperson (right) + quote details + financial summary */}
             <div className="border-b border-slate-200/60">
+              <QuoteBanner bannerUrl={template?.banner_url} />
               {/* LTR column order: left = מפיק, middle = פרטי הצעה, right = שם לקוח — text ~110% of previous text-xs */}
               <div
                 className="grid grid-cols-1 gap-6 border-t border-slate-200/80 bg-gradient-to-b from-slate-50/90 to-white p-4 backdrop-blur-sm sm:p-6 md:grid-cols-3 md:p-8"
