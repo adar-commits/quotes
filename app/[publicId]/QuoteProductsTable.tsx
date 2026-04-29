@@ -98,8 +98,15 @@ export default function QuoteProductsTable({
 
   return (
     <>
-      <div className="overflow-x-auto border-t border-slate-200/80">
-        <table className="w-full min-w-[500px] border-collapse [&_td]:text-right [&_th]:text-right">
+      <div className="overflow-x-auto border-t border-slate-200/80" dir="rtl">
+        <table className="w-full min-w-[500px] table-fixed border-collapse">
+          <colgroup>
+            <col className="w-[12%]" />
+            <col />
+            <col className="w-[8%]" />
+            <col className="w-[14%]" />
+            <col className="w-[14%]" />
+          </colgroup>
           <thead>
             <tr
               className="border-b-2 border-slate-200 text-white"
@@ -109,7 +116,7 @@ export default function QuoteProductsTable({
                 <button
                   type="button"
                   onClick={() => toggleSort("sku")}
-                  className="inline-flex w-full items-center justify-end gap-1 text-xs font-bold uppercase tracking-wider underline-offset-2 hover:underline"
+                  className="block w-full text-right text-xs font-bold uppercase tracking-wider underline-offset-2 hover:underline"
                 >
                   מק&quot;ט
                   {sortKey === "sku" ? (sortDir === "asc" ? " ↑" : " ↓") : ""}
@@ -119,7 +126,7 @@ export default function QuoteProductsTable({
                 <button
                   type="button"
                   onClick={() => toggleSort("product_desc")}
-                  className="inline-flex w-full items-center justify-end gap-1 text-xs font-bold uppercase tracking-wider underline-offset-2 hover:underline"
+                  className="block w-full text-right text-xs font-bold uppercase tracking-wider underline-offset-2 hover:underline"
                 >
                   תאור מוצר
                   {sortKey === "product_desc"
@@ -133,7 +140,7 @@ export default function QuoteProductsTable({
                 <button
                   type="button"
                   onClick={() => toggleSort("qty")}
-                  className="inline-flex w-full items-center justify-end gap-1 text-xs font-bold uppercase tracking-wider underline-offset-2 hover:underline"
+                  className="block w-full text-right text-xs font-bold uppercase tracking-wider underline-offset-2 hover:underline"
                 >
                   כמות
                   {sortKey === "qty"
@@ -147,7 +154,7 @@ export default function QuoteProductsTable({
                 <button
                   type="button"
                   onClick={() => toggleSort("unit_price")}
-                  className="inline-flex w-full items-center justify-end gap-1 text-xs font-bold uppercase tracking-wider underline-offset-2 hover:underline"
+                  className="block w-full text-right text-xs font-bold uppercase tracking-wider underline-offset-2 hover:underline"
                 >
                   מחיר ליחידה
                   {sortKey === "unit_price"
@@ -161,7 +168,7 @@ export default function QuoteProductsTable({
                 <button
                   type="button"
                   onClick={() => toggleSort("line_total")}
-                  className="inline-flex w-full items-center justify-end gap-1 text-xs font-bold uppercase tracking-wider underline-offset-2 hover:underline"
+                  className="block w-full text-right text-xs font-bold uppercase tracking-wider underline-offset-2 hover:underline"
                 >
                   סה&quot;כ
                   {sortKey === "line_total"

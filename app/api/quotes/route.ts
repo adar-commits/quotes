@@ -172,6 +172,7 @@ export async function POST(request: NextRequest) {
     await supabase.from("quote_representatives").insert({
       quote_id: quoteId,
       rep_phone: rep.repPhone ?? null,
+      rep_email: rep.repEmail ?? null,
       rep_avatar: rep.repAvatar ?? null,
       rep_full_name: rep.repFullName ?? null,
     });

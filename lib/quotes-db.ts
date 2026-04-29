@@ -41,6 +41,7 @@ export type QuoteCustomerRow = {
 
 export type QuoteRepresentativeRow = {
   rep_phone: string | null;
+  rep_email: string | null;
   rep_avatar: string | null;
   rep_full_name: string | null;
 };
@@ -115,7 +116,7 @@ export async function getQuoteByPublicId(
       .maybeSingle(),
     supabase
       .from("quote_representatives")
-      .select("rep_phone, rep_avatar, rep_full_name")
+      .select("rep_phone, rep_email, rep_avatar, rep_full_name")
       .eq("quote_id", quote.id)
       .maybeSingle(),
     supabase

@@ -26,6 +26,7 @@ type QuotationPayloadCore = {
   paymentsTerms: string[];
   Representative: {
     repPhone: string;
+    repEmail?: string | null;
     repAvatar: string;
     repFullName: string;
   };

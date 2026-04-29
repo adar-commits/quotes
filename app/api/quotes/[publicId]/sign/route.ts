@@ -33,7 +33,7 @@ export async function POST(
       .maybeSingle(),
     supabase
       .from("quote_representatives")
-      .select("rep_phone, rep_avatar, rep_full_name")
+      .select("rep_phone, rep_email, rep_avatar, rep_full_name")
       .eq("quote_id", quote.id)
       .maybeSingle(),
     supabase
