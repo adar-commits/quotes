@@ -39,22 +39,23 @@ function shortenId(id: string | null): string {
   return id.length > 12 ? `${id.slice(0, 8)}…` : id;
 }
 
-/** 5–7 product attribute labels + values (fictive when missing). */
+/** Only attributes with non-empty values from the API — no placeholder defaults. */
 function getProductAttributes(p: {
   color?: string | null;
   shape?: string | null;
   material?: string | null;
   technique?: string | null;
-}) {
-  return [
-    { label: "צבע", value: p.color ?? "שנהב" },
-    { label: "צורה", value: p.shape ?? "מלבן" },
-    { label: "חומר", value: p.material ?? "כותנה" },
-    { label: "טכניקת אריגה", value: p.technique ?? "אריגה" },
-    { label: "גודל", value: "170×120 ס״מ" },
-    { label: "משקל", value: "2.5 ק״ג" },
-    { label: "מוצא", value: "ישראל" },
-  ];
+}): { label: string; value: string }[] {
+  const out: { label: string; value: string }[] = [];
+  const add = (label: string, raw: string | null | undefined) => {
+    const v = typeof raw === "string" ? raw.trim() : "";
+    if (v) out.push({ label, value: v });
+  };
+  add("צבע", p.color);
+  add("צורה", p.shape);
+  add("חומר", p.material);
+  add("טכניקת אריגה", p.technique);
+  return out;
 }
 
 export async function generateMetadata({
@@ -293,20 +294,30 @@ export default async function QuotePage({
                               mainColor={template?.main_color}
                             />
                           </div>
-                          <p className="text-[0.7rem] font-bold uppercase tracking-widest text-slate-400">
-                            {p.sku ?? "—"}
-                          </p>
-                          <div className="space-y-2">
-                            <p className="leading-relaxed">
-                              <span className="font-bold text-slate-800" style={{ color: mainColor }}>שם המוצר: </span>
-                              <span className="text-slate-700">{p.product_desc ?? "—"}</span>
+                          {p.sku?.trim() ? (
+                            <p className="text-[0.7rem] font-bold uppercase tracking-widest text-slate-400">
+                              {p.sku}
                             </p>
+                          ) : null}
+                          <div className="space-y-2">
+                            {p.product_desc?.trim() ? (
+                              <p className="leading-relaxed">
+                                <span className="font-bold text-slate-800" style={{ color: mainColor }}>שם המוצר: </span>
+                                <span className="text-slate-700">{p.product_desc}</span>
+                              </p>
+                            ) : null}
                             {attrs.map(({ label, value }) => (
                               <p key={label} className="leading-relaxed">
                                 <span className="font-bold text-slate-800" style={{ color: mainColor }}>{label}: </span>
                                 <span className="text-slate-700">{value}</span>
                               </p>
                             ))}
+                            {p.additional_desc?.trim() ? (
+                              <p className="leading-relaxed text-slate-700">
+                                <span className="font-bold text-slate-800" style={{ color: mainColor }}>הערה: </span>
+                                {p.additional_desc.trim()}
+                              </p>
+                            ) : null}
                           </div>
                           <div className="flex flex-wrap justify-end gap-x-5 gap-y-1 border-t border-slate-100 pt-3 text-sm">
                             <span className="text-slate-600">כמות: <strong className="text-slate-800">{p.qty}</strong></span>
