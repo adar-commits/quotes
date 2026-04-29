@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServiceRoleClient } from "@/lib/supabase-server";
 import { calculateQuoteBreakdown } from "@/lib/quote-total";
 import type { QuotationPayload } from "@/lib/quotation-types";
+import { extractQuotationCustomerFields } from "@/lib/quotation-customer-extract";
 
 function parseInvoiceDate(value: string): string | null {
   if (!value) return null;
@@ -147,34 +148,11 @@ export async function POST(request: NextRequest) {
       ? (q.customer as Record<string, unknown>)
       : ({} as Record<string, unknown>);
 
-  /** First non-empty string among candidates, else null. */
-  function firstStr(...candidates: unknown[]): string | null {
-    for (const v of candidates) {
-      if (v == null) continue;
-      const s = String(v).trim();
-      if (s) return s;
-    }
-    return null;
-  }
-
-  const customer_id = firstStr(
-    nested.customerID,
-    nested.customer_id,
-    root.customerID,
-    root.customer_id
-  );
-  const customer_name = firstStr(
-    nested.customerName,
-    nested.customer_name,
-    root.customerName,
-    root.customer_name
-  );
-  const addressCandidate =
-    nested.customerAddress ?? nested.customer_address ?? root.customerAddress ?? root.customer_address;
-  const customer_address =
-    addressCandidate === undefined || addressCandidate === null
-      ? null
-      : String(addressCandidate);
+  const {
+    customer_id,
+    customer_name,
+    customer_address,
+  } = extractQuotationCustomerFields(root, nested);
 
   if (
     customer_id ||
