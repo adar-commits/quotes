@@ -1,6 +1,6 @@
-export type QuotationPayload = {
+type QuotationPayloadCore = {
   vat: number;
-  customer: {
+  customer?: {
     customerID: string;
     customerName: string;
     customerAddress: string;
@@ -35,4 +35,11 @@ export type QuotationPayload = {
   /** Template id (uuid) or template_key (e.g. 'redcarpet' | 'pozitive' | 'elite_rugs') for theming */
   template_id?: string | null;
   template_key?: string | null;
+};
+
+/** `POST /api/quotes` accepts the same `customer` fields at the top level (e.g. `customerName` next to `vat`); they merge with `customer` when the nested value is empty. */
+export type QuotationPayload = QuotationPayloadCore & {
+  customerID?: string;
+  customerName?: string;
+  customerAddress?: string;
 };

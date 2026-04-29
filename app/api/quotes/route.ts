@@ -141,14 +141,51 @@ export async function POST(request: NextRequest) {
     publicId = quoteRow.public_id;
   }
 
-  const customer = q.customer;
-  if (customer && typeof customer === "object") {
-    const c = customer as Record<string, unknown>;
+  const root = raw as Record<string, unknown>;
+  const nested =
+    q.customer && typeof q.customer === "object" && !Array.isArray(q.customer)
+      ? (q.customer as Record<string, unknown>)
+      : ({} as Record<string, unknown>);
+
+  /** First non-empty string among candidates, else null. */
+  function firstStr(...candidates: unknown[]): string | null {
+    for (const v of candidates) {
+      if (v == null) continue;
+      const s = String(v).trim();
+      if (s) return s;
+    }
+    return null;
+  }
+
+  const customer_id = firstStr(
+    nested.customerID,
+    nested.customer_id,
+    root.customerID,
+    root.customer_id
+  );
+  const customer_name = firstStr(
+    nested.customerName,
+    nested.customer_name,
+    root.customerName,
+    root.customer_name
+  );
+  const addressCandidate =
+    nested.customerAddress ?? nested.customer_address ?? root.customerAddress ?? root.customer_address;
+  const customer_address =
+    addressCandidate === undefined || addressCandidate === null
+      ? null
+      : String(addressCandidate);
+
+  if (
+    customer_id ||
+    customer_name ||
+    customer_address != null
+  ) {
     await supabase.from("quote_customers").insert({
       quote_id: quoteId,
-      customer_id: (c.customerID ?? c.customer_id) ?? null,
-      customer_name: (c.customerName ?? c.customer_name) ?? null,
-      customer_address: (c.customerAddress ?? c.customer_address) ?? null,
+      customer_id: customer_id ?? null,
+      customer_name: customer_name ?? null,
+      customer_address: customer_address,
     });
   }
 
