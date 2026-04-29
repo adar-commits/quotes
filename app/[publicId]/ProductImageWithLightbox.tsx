@@ -56,7 +56,7 @@ export default function ProductImageWithLightbox({
         className={`block text-left w-full h-full min-h-[120px] ${containerClassName ?? ""}`}
         aria-label="הגדל תמונה"
       >
-        <div className="relative w-full h-full overflow-hidden rounded-xl bg-slate-100/50 transition-transform hover:scale-[1.02]">
+        <div className="relative h-full w-full overflow-hidden rounded-xl bg-white transition-transform hover:scale-[1.02]">
           <Image
             src={src}
             alt={alt}

@@ -1,12 +1,10 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import Image from "next/image";
 import { calculateQuoteBreakdown } from "@/lib/quote-total";
 import { getQuoteByPublicId } from "@/lib/quotes-db";
 import QuoteProductsTable from "./QuoteProductsTable";
 import QuoteSignature from "./QuoteSignature";
 import QuoteReveal from "./QuoteReveal";
-import QuoteBanner from "./QuoteBanner";
 import ApprovalStatusSelect from "./ApprovalStatusSelect";
 import ContactStrip from "./ContactStrip";
 import ProductImageWithLightbox from "./ProductImageWithLightbox";
@@ -114,7 +112,6 @@ export default async function QuotePage({
           <div className="overflow-hidden rounded-3xl border border-white/40 bg-white/90 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] ring-1 ring-black/5 backdrop-blur-xl">
             {/* Page 1: Chart only — banner + customer/salesperson (right) + quote details + financial summary */}
             <div className="border-b border-slate-200/60">
-              <QuoteBanner bannerUrl={template?.banner_url} />
               {/* LTR column order: left = מפיק, middle = פרטי הצעה, right = שם לקוח — text ~110% of previous text-xs */}
               <div
                 className="grid grid-cols-1 gap-6 border-t border-slate-200/80 bg-gradient-to-b from-slate-50/90 to-white p-4 backdrop-blur-sm sm:p-6 md:grid-cols-3 md:p-8"
@@ -294,7 +291,7 @@ export default async function QuotePage({
                               src={p.picture_url}
                               fill
                               className="object-contain"
-                              containerClassName="relative mx-auto h-72 w-full max-w-sm overflow-hidden rounded-xl bg-slate-50/80 md:h-96 md:max-w-none"
+                              containerClassName="relative mx-auto h-72 w-full max-w-sm overflow-hidden rounded-xl bg-white md:h-96 md:max-w-none"
                               sizes="(max-width: 768px) 100vw, 448px"
                             />
                           </div>
@@ -364,19 +361,6 @@ export default async function QuotePage({
               </div>
             )}
           </div>
-
-        <footer className="mt-8 text-center">
-          <div className="rounded-2xl border border-slate-200/80 bg-white/80 px-4 py-5 shadow-sm backdrop-blur-sm">
-            <p className="text-sm font-medium text-slate-600">כנרת 10, איירפורט סיטי</p>
-            <Link
-              href="/"
-              className="mt-2 inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg text-base font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-[#801a1e] sm:min-h-0 sm:min-w-0 sm:px-4 sm:text-sm"
-              style={{ WebkitTapHighlightColor: 'transparent' }}
-            >
-              csquotes.vercel.app
-            </Link>
-          </div>
-        </footer>
       </div>
     </div>
     </QuoteReveal>
