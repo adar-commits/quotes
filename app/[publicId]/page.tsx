@@ -5,12 +5,14 @@ import { getQuoteByPublicId } from "@/lib/quotes-db";
 import QuoteSignature from "./QuoteSignature";
 import QuoteReveal from "./QuoteReveal";
 import QuoteBanner from "./QuoteBanner";
-import DefaultAvatar from "./DefaultAvatar";
 import ApprovalStatusSelect from "./ApprovalStatusSelect";
 import ContactStrip from "./ContactStrip";
 import ProductImageWithLightbox from "./ProductImageWithLightbox";
 
 const DEFAULT_MAIN = "#801a1e";
+
+const REP_AVATAR_FALLBACK =
+  "https://cdn.shopify.com/s/files/1/0594/9839/7887/files/iScreen_Shoter_-_Google_Chrome_-_260429144738-removebg-preview.png?v=1777463340";
 
 function formatCurrency(n: number) {
   return new Intl.NumberFormat("he-IL", {
@@ -110,77 +112,99 @@ export default async function QuotePage({
             <div className="border-b border-slate-200/60">
               <QuoteBanner bannerUrl={template?.banner_url} />
               <div className="grid grid-cols-1 gap-6 border-t border-slate-200/80 bg-gradient-to-b from-slate-50/90 to-white p-4 backdrop-blur-sm sm:p-6 md:grid-cols-3 md:p-8">
-                {/* Col 1 (right in RTL): מפיק ההצעה — positioned right */}
-                <div className="flex items-center gap-4 rounded-2xl border border-slate-200/60 bg-white/80 p-4 shadow-sm ring-1 ring-slate-900/5 transition-shadow hover:shadow-md">
-                  <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl sm:h-24 sm:w-24">
-                    {representative?.rep_avatar ? (
-                      <Image
-                        src={representative.rep_avatar}
-                        alt=""
-                        fill
-                        className="object-cover"
-                      />
-                    ) : (
-                      <DefaultAvatar />
-                    )}
-                  </div>
-                  <div>
-                    <p className="text-[0.7rem] font-bold uppercase tracking-widest text-slate-400">
-                      מפיק ההצעה
-                    </p>
-                    <p className="mt-1 font-semibold text-slate-800">
-                      {representative?.rep_full_name ?? "—"}
-                    </p>
-                    {representative?.rep_phone && (
-                      <a
-                        href={`tel:${representative.rep_phone.replace(/\D/g, "")}`}
-                        className="mt-1 inline-flex items-center rounded-lg px-2 py-1 text-base text-slate-600 transition-colors hover:bg-slate-100 hover:text-[#801a1e] sm:min-h-[44px] sm:min-w-[44px] sm:justify-center sm:py-2 sm:text-sm"
-                        style={{ WebkitTapHighlightColor: 'transparent' }}
-                      >
-                        {representative.rep_phone}
-                      </a>
-                    )}
-                  </div>
-                </div>
-                {/* Col 2 (middle): Customer */}
-                <div className="rounded-2xl border border-slate-200/60 bg-white/80 p-4 shadow-sm ring-1 ring-slate-900/5 transition-shadow hover:shadow-md">
-                  <p className="text-[0.7rem] font-bold uppercase tracking-widest text-slate-400">
+                {/* Col 1 (rightmost in RTL): שם לקוח */}
+                <div className="rounded-2xl border border-slate-200/60 bg-white/80 p-4 text-right shadow-sm ring-1 ring-slate-900/5 transition-shadow hover:shadow-md">
+                  <p
+                    className="text-xs font-normal uppercase tracking-wider"
+                    style={{ color: mainColor }}
+                  >
                     שם לקוח
                   </p>
-                  <p className="mt-2 text-base font-semibold text-slate-800 sm:text-lg">
-                    {customer?.customer_name || customer?.customer_id ?? "—"}
+                  <p className="mt-1 text-xs font-normal text-slate-700">
+                    {(customer?.customer_name || customer?.customer_id) ?? "—"}
                   </p>
                   {customer?.customer_logo && (
-                    <div className="mt-3 relative h-16 w-auto max-w-[140px] aspect-[2/1] overflow-hidden rounded-lg border border-slate-200/80 bg-slate-50">
+                    <div className="mt-3 relative ml-auto h-16 w-auto max-w-[140px] aspect-[2/1] overflow-hidden rounded-lg border border-slate-200/80 bg-slate-50">
                       <Image
                         src={customer.customer_logo}
                         alt=""
                         fill
-                        className="object-contain object-left"
+                        className="object-contain object-right"
                         sizes="140px"
                       />
                     </div>
                   )}
                 </div>
+                {/* Col 2 (middle): מפיק ההצעה — title, square avatar, name, phone */}
+                <div className="rounded-2xl border border-slate-200/60 bg-white/80 p-4 text-right shadow-sm ring-1 ring-slate-900/5 transition-shadow hover:shadow-md">
+                  <p
+                    className="text-xs font-normal uppercase tracking-wider"
+                    style={{ color: mainColor }}
+                  >
+                    מפיק ההצעה
+                  </p>
+                  <div className="relative mt-2 mr-0 ml-auto h-24 w-24 shrink-0 overflow-hidden rounded-lg border border-slate-200/80 bg-slate-50">
+                    <Image
+                      src={
+                        representative?.rep_avatar?.trim()
+                          ? representative.rep_avatar
+                          : REP_AVATAR_FALLBACK
+                      }
+                      alt=""
+                      fill
+                      className="object-cover"
+                      sizes="96px"
+                    />
+                  </div>
+                  <p className="mt-2 text-xs font-normal text-slate-700">
+                    {representative?.rep_full_name ?? "—"}
+                  </p>
+                  {representative?.rep_phone && (
+                    <a
+                      href={`tel:${representative.rep_phone.replace(/\D/g, "")}`}
+                      className="mt-1 inline-flex rounded-lg px-1 py-1 text-xs font-normal text-slate-600 transition-colors hover:bg-slate-100 hover:opacity-90 sm:min-h-[44px] sm:min-w-[44px] sm:items-center sm:justify-center sm:py-2"
+                      style={{ WebkitTapHighlightColor: "transparent" }}
+                    >
+                      {representative.rep_phone}
+                    </a>
+                  )}
+                </div>
                 {/* Col 3 (left in RTL): Quote #, date, project */}
-                <div className="space-y-3 rounded-2xl border border-slate-200/60 bg-white/80 p-4 shadow-sm ring-1 ring-slate-900/5 transition-shadow hover:shadow-md">
+                <div className="space-y-3 rounded-2xl border border-slate-200/60 bg-white/80 p-4 text-right shadow-sm ring-1 ring-slate-900/5 transition-shadow hover:shadow-md">
                   <div>
-                    <p className="text-[0.7rem] font-bold uppercase tracking-widest text-slate-400">
+                    <p
+                      className="text-xs font-normal uppercase tracking-wider"
+                      style={{ color: mainColor }}
+                    >
                       מס׳ הצעה
                     </p>
-                    <p className="mt-1 text-base font-semibold text-slate-800 sm:text-lg">{quote.public_id ? quote.public_id.slice(-10) : (quote.quotation_id ?? quote.invoice_id ?? "—")}</p>
+                    <p className="mt-1 text-xs font-normal text-slate-700">
+                      {quote.public_id
+                        ? quote.public_id.slice(-10)
+                        : quote.quotation_id ?? quote.invoice_id ?? "—"}
+                    </p>
                   </div>
                   <div>
-                    <p className="text-[0.7rem] font-bold uppercase tracking-widest text-slate-400">
+                    <p
+                      className="text-xs font-normal uppercase tracking-wider"
+                      style={{ color: mainColor }}
+                    >
                       תאריך הפקה
                     </p>
-                    <p className="mt-1 text-slate-700">{formatDate(quote.invoice_creation_date)}</p>
+                    <p className="mt-1 text-xs font-normal text-slate-700">
+                      {formatDate(quote.invoice_creation_date)}
+                    </p>
                   </div>
                   <div>
-                    <p className="text-[0.7rem] font-bold uppercase tracking-widest text-slate-400">
+                    <p
+                      className="text-xs font-normal uppercase tracking-wider"
+                      style={{ color: mainColor }}
+                    >
                       שם הפרויקט
                     </p>
-                    <p className="mt-1 text-slate-700">{quote.project_name ?? "—"}</p>
+                    <p className="mt-1 text-xs font-normal text-slate-700">
+                      {quote.project_name ?? "—"}
+                    </p>
                   </div>
                 </div>
               </div>

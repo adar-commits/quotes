@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "quotes.carpetshop.co.il", pathname: "/**" },
       { protocol: "https", hostname: "app.fireberry.com", pathname: "/**" },
       { protocol: "https", hostname: "api.dicebear.com", pathname: "/**" },
+      { protocol: "https", hostname: "cdn.shopify.com", pathname: "/**" },
     ],
   },
 };
