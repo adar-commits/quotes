@@ -9,11 +9,11 @@
 -- DELETE FROM quotes WHERE public_id IN ('test-redcarpet','test-pozitive','test-elite');
 
 INSERT INTO quotes (public_id, vat, invoice_id, project_name, quotation_id, special_discount, require_signature, invoice_creation_date, agent_code, agent_desc, template_id)
-SELECT 'test-redcarpet', 18, 'INV-2026-001', 'דוגמה Red Carpet', 'QT-RC-001', 50, true, now() - interval '2 days', 'AG001', 'סוכן מכירות', id FROM quote_templates WHERE template_key = 'redcarpet' LIMIT 1
+SELECT 'test-redcarpet', 18, 'INV-2026-001', 'דוגמה Red Carpet', 'QT-RC-001', 0, true, now() - interval '2 days', 'AG001', 'סוכן מכירות', id FROM quote_templates WHERE template_key = 'redcarpet' LIMIT 1
 ON CONFLICT (public_id) DO UPDATE SET vat = 18, invoice_id = EXCLUDED.invoice_id, project_name = EXCLUDED.project_name, quotation_id = EXCLUDED.quotation_id, special_discount = EXCLUDED.special_discount, require_signature = EXCLUDED.require_signature, invoice_creation_date = EXCLUDED.invoice_creation_date, agent_code = EXCLUDED.agent_code, agent_desc = EXCLUDED.agent_desc, template_id = EXCLUDED.template_id;
 
 INSERT INTO quotes (public_id, vat, invoice_id, project_name, quotation_id, special_discount, require_signature, invoice_creation_date, agent_code, agent_desc, template_id)
-SELECT 'test-pozitive', 18, 'INV-2026-002', 'דוגמה Pozitive', 'QT-PZ-002', 25, true, now() - interval '1 day', 'AG002', 'נציג שירות', id FROM quote_templates WHERE template_key = 'pozitive' LIMIT 1
+SELECT 'test-pozitive', 18, 'INV-2026-002', 'דוגמה Pozitive', 'QT-PZ-002', 0, true, now() - interval '1 day', 'AG002', 'נציג שירות', id FROM quote_templates WHERE template_key = 'pozitive' LIMIT 1
 ON CONFLICT (public_id) DO UPDATE SET vat = 18, invoice_id = EXCLUDED.invoice_id, project_name = EXCLUDED.project_name, quotation_id = EXCLUDED.quotation_id, special_discount = EXCLUDED.special_discount, require_signature = EXCLUDED.require_signature, invoice_creation_date = EXCLUDED.invoice_creation_date, agent_code = EXCLUDED.agent_code, agent_desc = EXCLUDED.agent_desc, template_id = EXCLUDED.template_id;
 
 INSERT INTO quotes (public_id, vat, invoice_id, project_name, quotation_id, special_discount, require_signature, invoice_creation_date, agent_code, agent_desc, template_id)

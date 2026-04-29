@@ -11,6 +11,8 @@
 
 Send a **single quote object** or an **array with one quote object**. Fields map to your reference JSON.
 
+- **`specialDiscount`** – percentage (0–100) applied to the **line subtotal** (sum of all product lines) before VAT. Example: `10` means 10% off the subtotal. Omit or use `0` for no quote-level discount.
+
 ### Minimal example
 
 ```json

@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { calculateQuoteBreakdown } from "@/lib/quote-total";
 import { getQuoteByPublicId } from "@/lib/quotes-db";
+import QuoteProductsTable from "./QuoteProductsTable";
 import QuoteSignature from "./QuoteSignature";
 import QuoteReveal from "./QuoteReveal";
 import QuoteBanner from "./QuoteBanner";
@@ -84,7 +85,7 @@ export default async function QuotePage({
   const mainColor = template?.main_color ?? DEFAULT_MAIN;
   const bulletsColor = template?.bullets_color ?? mainColor;
 
-  const { subtotal, vatAmount, total } = calculateQuoteBreakdown({
+  const breakdown = calculateQuoteBreakdown({
     vat: Number(quote.vat),
     specialDiscount: Number(quote.special_discount),
     lines: products.map((p) => ({
@@ -210,59 +211,12 @@ export default async function QuotePage({
                   </div>
                 </div>
               </div>
-              {/* Chart table: מק"ט, תאור מוצר, כמות, מחיר ליחידה, סה"כ — above calculations strip */}
-              <div className="overflow-x-auto border-t border-slate-200/80">
-                <table className="w-full min-w-[500px] border-collapse text-right">
-                  <thead>
-                    <tr className="border-b-2 border-slate-200 text-white" style={{ backgroundColor: mainColor }}>
-                      <th className="py-3 px-3 text-xs font-bold uppercase tracking-wider">מק&quot;ט</th>
-                      <th className="py-3 px-3 text-xs font-bold uppercase tracking-wider">תאור מוצר</th>
-                      <th className="py-3 px-3 text-xs font-bold uppercase tracking-wider">כמות</th>
-                      <th className="py-3 px-3 text-xs font-bold uppercase tracking-wider">מחיר ליחידה</th>
-                      <th className="py-3 px-3 text-xs font-bold uppercase tracking-wider">סה&quot;כ</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {products.map((p, i) => {
-                      const lineTotal = p.qty * (Number(p.unit_price) - Number(p.unit_discount));
-                      return (
-                        <tr key={i} className={`border-b border-slate-100 ${i % 2 === 1 ? "bg-slate-50/80" : ""}`}>
-                          <td className="py-3 px-3 text-sm text-slate-700">{p.sku ?? "—"}</td>
-                          <td className="py-3 px-3 text-sm text-slate-700">{p.product_desc ?? "—"}</td>
-                          <td className="py-3 px-3 text-sm text-slate-700">{p.qty}</td>
-                          <td className="py-3 px-3 text-sm text-slate-700" dir="ltr">{formatCurrency(Number(p.unit_price))}</td>
-                          <td className="py-3 px-3 text-sm font-semibold text-slate-800" dir="ltr">{formatCurrency(lineTotal)}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-              {/* Chart of numbers — financial summary on page 1 (left-aligned) */}
-              <div
-                className="relative flex flex-col gap-6 px-4 py-6 text-white sm:flex-row sm:flex-wrap sm:items-center sm:gap-4 md:px-8"
-                style={{
-                  background: `linear-gradient(135deg, ${mainColor} 0%, ${mainColor}dd 100%)`,
-                  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.08), 0 4px 12px rgba(0,0,0,0.1)",
-                }}
-                dir="ltr"
-              >
-                {/* Order RTL: סה"כ ללא מע"מ (right), מע"מ (middle), סה"כ לתשלום (left) — so in LTR DOM: total left, vat middle, subtotal right */}
-                <div className="flex flex-col gap-4 text-left sm:flex-row sm:flex-wrap sm:gap-8 md:gap-12">
-                  <div className="text-left">
-                    <p className="text-sm font-medium opacity-90">סה&quot;כ לתשלום</p>
-                    <p className="text-xl font-bold sm:text-2xl">{formatCurrency(total)}</p>
-                  </div>
-                  <div className="text-left">
-                    <p className="text-sm font-medium opacity-90">מע&quot;מ ({quote.vat}%)</p>
-                    <p className="text-base font-bold sm:text-lg">{formatCurrency(vatAmount)}</p>
-                  </div>
-                  <div className="text-left">
-                    <p className="text-sm font-medium opacity-90">סה&quot;כ ללא מע&quot;מ</p>
-                    <p className="text-base font-bold sm:text-lg">{formatCurrency(subtotal)}</p>
-                  </div>
-                </div>
-              </div>
+              <QuoteProductsTable
+                products={products}
+                mainColor={mainColor}
+                quoteVat={Number(quote.vat)}
+                breakdown={breakdown}
+              />
               {/* Terms: headline text-right */}
               <div className="border-t border-slate-100 bg-slate-50/50 p-4 sm:p-6 md:p-8">
                 <h3
