@@ -25,6 +25,28 @@ export async function POST(
     return NextResponse.json({ error: "Quote not found" }, { status: 404 });
   }
 
+  let signature: {
+    signerName?: string;
+    companyName?: string;
+    companyReg?: string;
+  } = {};
+  try {
+    const body: unknown = await request.json();
+    if (body && typeof body === "object" && !Array.isArray(body)) {
+      const b = body as Record<string, unknown>;
+      signature = {
+        signerName:
+          typeof b.signerName === "string" ? b.signerName : undefined,
+        companyName:
+          typeof b.companyName === "string" ? b.companyName : undefined,
+        companyReg:
+          typeof b.companyReg === "string" ? b.companyReg : undefined,
+      };
+    }
+  } catch {
+    /* optional or invalid JSON body */
+  }
+
   const [customerRes, repRes, productsRes, termsRes] = await Promise.all([
     supabase
       .from("quote_customers")
@@ -65,6 +87,7 @@ export async function POST(
     representative,
     products,
     paymentTerms,
+    signature,
   };
 
   try {

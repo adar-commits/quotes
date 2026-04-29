@@ -6,7 +6,8 @@ type Props = { quotePublicId: string };
 
 export default function QuoteSignature({ quotePublicId }: Props) {
   const [name, setName] = useState("");
-  const [role, setRole] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [companyReg, setCompanyReg] = useState("");
   const [signed, setSigned] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -182,7 +183,11 @@ export default function QuoteSignature({ quotePublicId }: Props) {
       const res = await fetch(`/api/quotes/${quotePublicId}/sign`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ signerName: name, signerRole: role }),
+        body: JSON.stringify({
+          signerName: name,
+          companyName,
+          companyReg,
+        }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
@@ -230,19 +235,36 @@ export default function QuoteSignature({ quotePublicId }: Props) {
           </div>
           <div className="relative">
             <input
-              id="sig-role"
+              id="sig-company"
               type="text"
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
+              value={companyName}
+              onChange={(e) => setCompanyName(e.target.value)}
               placeholder=" "
               className="peer min-h-[44px] w-full rounded-xl border-2 border-slate-200 bg-slate-50/80 px-3 py-3 pt-5 text-base text-right transition-all focus:border-[#801a1e] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#801a1e]/20"
-              autoComplete="organization-title"
+              autoComplete="organization"
             />
             <label
-              htmlFor="sig-role"
+              htmlFor="sig-company"
               className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 transition-all peer-focus:top-3 peer-focus:text-xs peer-focus:text-[#801a1e] peer-focus:font-semibold peer-[:not(:placeholder-shown)]:top-3 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:font-semibold"
             >
-              תפקיד
+              שם החברה
+            </label>
+          </div>
+          <div className="relative">
+            <input
+              id="sig-company-reg"
+              type="text"
+              value={companyReg}
+              onChange={(e) => setCompanyReg(e.target.value)}
+              placeholder=" "
+              className="peer min-h-[44px] w-full rounded-xl border-2 border-slate-200 bg-slate-50/80 px-3 py-3 pt-5 text-base text-right transition-all focus:border-[#801a1e] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#801a1e]/20"
+              autoComplete="off"
+            />
+            <label
+              htmlFor="sig-company-reg"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 transition-all peer-focus:top-3 peer-focus:text-xs peer-focus:text-[#801a1e] peer-focus:font-semibold peer-[:not(:placeholder-shown)]:top-3 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:font-semibold"
+            >
+              ח.פ
             </label>
           </div>
         </div>

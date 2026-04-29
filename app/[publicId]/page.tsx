@@ -285,50 +285,23 @@ export default async function QuotePage({
                         className="quote-card-hover flex flex-col gap-4 rounded-2xl border border-slate-200/80 bg-white/90 p-4 shadow-md ring-1 ring-slate-900/5 backdrop-blur-sm md:flex-row md:items-start md:gap-6 md:p-6"
                       >
                         {/* Product image + SKU below (theme red) — narrower column to give +10% to text */}
-                        <div className="flex w-full shrink-0 flex-col items-center md:w-[17.6rem] md:max-w-[30%]">
+                        <div className="flex w-full shrink-0 flex-col items-center md:w-[20.24rem] md:max-w-[34.5%]">
                           <div className="w-full">
                             <ProductImageWithLightbox
                               src={p.picture_url}
                               fill
                               className="object-contain"
-                              containerClassName="relative mx-auto h-[14.4rem] w-full max-w-[19.2rem] overflow-hidden rounded-xl bg-white md:h-[19.2rem] md:max-w-none"
-                              sizes="(max-width: 768px) 100vw, 360px"
+                              containerClassName="relative mx-auto h-[16.56rem] w-full max-w-[22.08rem] overflow-hidden rounded-xl bg-white md:h-[22.08rem] md:max-w-none"
+                              sizes="(max-width: 768px) 100vw, 414px"
                             />
                           </div>
-                          {p.sku?.trim() ? (
-                            <p
-                              className="mt-3 text-center text-sm font-semibold uppercase tracking-wide"
-                              style={{ color: mainColor }}
-                            >
-                              {p.sku}
-                            </p>
-                          ) : null}
                         </div>
-                        {/* Attributes + pricing row with סטטוס אישור */}
-                        <div className="min-w-0 flex-1 space-y-3 text-right md:max-w-[55%]">
-                          <div className="space-y-2">
-                            {p.product_desc?.trim() ? (
-                              <p className="leading-relaxed">
-                                <span className="font-bold text-slate-800" style={{ color: mainColor }}>שם המוצר: </span>
-                                <span className="text-slate-700">{p.product_desc}</span>
-                              </p>
-                            ) : null}
-                            {attrs.map(({ label, value }) => (
-                              <p key={label} className="leading-relaxed">
-                                <span className="font-bold text-slate-800" style={{ color: mainColor }}>{label}: </span>
-                                <span className="text-slate-700">{value}</span>
-                              </p>
-                            ))}
-                            {p.additional_desc?.trim() ? (
-                              <p className="leading-relaxed text-slate-700">
-                                <span className="font-bold text-slate-800" style={{ color: mainColor }}>הערה: </span>
-                                {p.additional_desc.trim()}
-                              </p>
-                            ) : null}
-                          </div>
-                          <div className="flex flex-wrap items-center justify-end gap-x-4 gap-y-3 border-t border-slate-100 pt-3 text-sm">
+                        {/* Strip → attributes → separator */}
+                        <div className="min-w-0 flex-1 space-y-4 text-right md:max-w-[55%]">
+                          <div className="flex flex-wrap items-center justify-end gap-x-4 gap-y-3 border-b border-slate-200 pb-3 text-sm">
                             <span className="text-slate-600">
-                              כמות: <strong className="text-slate-800">{p.qty}</strong>
+                              כמות:{" "}
+                              <strong className="text-slate-800">{p.qty}</strong>
                             </span>
                             <span className="text-slate-600">
                               {formatCurrency(Number(p.unit_price))} ליח׳
@@ -345,6 +318,58 @@ export default async function QuotePage({
                               />
                             </div>
                           </div>
+                          <div className="space-y-2">
+                            {p.sku?.trim() ? (
+                              <p className="leading-relaxed">
+                                <span
+                                  className="font-bold text-slate-800"
+                                  style={{ color: mainColor }}
+                                >
+                                  מק&quot;ט:{" "}
+                                </span>
+                                <span className="text-slate-700">{p.sku}</span>
+                              </p>
+                            ) : null}
+                            {p.product_desc?.trim() ? (
+                              <p className="leading-relaxed">
+                                <span
+                                  className="font-bold text-slate-800"
+                                  style={{ color: mainColor }}
+                                >
+                                  שם המוצר:{" "}
+                                </span>
+                                <span className="text-slate-700">
+                                  {p.product_desc}
+                                </span>
+                              </p>
+                            ) : null}
+                            {attrs.map(({ label, value }) => (
+                              <p key={label} className="leading-relaxed">
+                                <span
+                                  className="font-bold text-slate-800"
+                                  style={{ color: mainColor }}
+                                >
+                                  {label}:{" "}
+                                </span>
+                                <span className="text-slate-700">{value}</span>
+                              </p>
+                            ))}
+                            {p.additional_desc?.trim() ? (
+                              <p className="leading-relaxed text-slate-700">
+                                <span
+                                  className="font-bold text-slate-800"
+                                  style={{ color: mainColor }}
+                                >
+                                  הערה:{" "}
+                                </span>
+                                {p.additional_desc.trim()}
+                              </p>
+                            ) : null}
+                          </div>
+                          <div
+                            className="border-t border-dashed border-slate-300 pt-3"
+                            aria-hidden
+                          />
                         </div>
                       </li>
                     );
