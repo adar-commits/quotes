@@ -4,6 +4,14 @@ import { calculateQuoteBreakdown } from "@/lib/quote-total";
 import type { QuotationPayload } from "@/lib/quotation-types";
 import { extractQuotationCustomerFields } from "@/lib/quotation-customer-extract";
 
+/** Matches standard UUID strings so clients can send a template id in `template_key` by mistake. */
+const UUID_STRING_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function isUuidString(s: string): boolean {
+  return UUID_STRING_RE.test(s.trim());
+}
+
 function parseInvoiceDate(value: string): string | null {
   if (!value) return null;
   const d = new Date(value);
@@ -44,14 +52,25 @@ export async function POST(request: NextRequest) {
   const rawTemplateId = (raw as { template_id?: string | null }).template_id;
   const rawTemplateKey = (raw as { template_key?: string | null }).template_key;
   if (rawTemplateId && typeof rawTemplateId === "string") {
-    templateId = rawTemplateId;
+    templateId = rawTemplateId.trim();
   } else if (rawTemplateKey && typeof rawTemplateKey === "string") {
-    const { data: t } = await supabase
-      .from("quote_templates")
-      .select("id")
-      .eq("template_key", rawTemplateKey.trim())
-      .single();
-    if (t) templateId = t.id;
+    const key = rawTemplateKey.trim();
+    // `template_key` is normally a slug (e.g. elite_rugs); accept UUID here too.
+    if (isUuidString(key)) {
+      const { data: t } = await supabase
+        .from("quote_templates")
+        .select("id")
+        .eq("id", key)
+        .maybeSingle();
+      if (t) templateId = t.id;
+    } else {
+      const { data: t } = await supabase
+        .from("quote_templates")
+        .select("id")
+        .eq("template_key", key)
+        .maybeSingle();
+      if (t) templateId = t.id;
+    }
   }
 
   // If quotation_id (e.g. OP-xxx) is sent and exists, update that quote instead of creating

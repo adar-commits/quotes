@@ -33,7 +33,7 @@ type QuotationPayloadCore = {
   specialDiscount: number;
   requireSignature: boolean;
   invoiceCreationDate: string;
-  /** Template id (uuid) or template_key (e.g. 'redcarpet' | 'pozitive' | 'elite_rugs') for theming */
+  /** Use `template_id` for the row UUID, or `template_key` for the slug (redcarpet | pozitive | elite_rugs). A UUID may also be sent as `template_key` and will resolve by id. */
   template_id?: string | null;
   template_key?: string | null;
 };

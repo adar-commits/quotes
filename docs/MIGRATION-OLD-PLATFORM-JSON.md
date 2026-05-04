@@ -30,7 +30,7 @@ To use a theme (Red Carpet, Pozitive, Elite Rugs), add one of:
 - `"template_key": "pozitive"`  
 - `"template_key": "elite_rugs"`  
 
-or a template UUID in `"template_id"`. If you omit both, the quote is created without a template (default styling).
+or a template UUID in `"template_id"`. A UUID may also be sent in `"template_key"` (it is resolved as a template id). If you omit both, the quote is created without a template (default styling).
 
 ## Summary
 
