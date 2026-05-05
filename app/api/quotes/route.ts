@@ -3,7 +3,7 @@ import { createServiceRoleClient } from "@/lib/supabase-server";
 import { calculateQuoteBreakdown } from "@/lib/quote-total";
 import type { QuotationPayload } from "@/lib/quotation-types";
 import { extractQuotationCustomerFields } from "@/lib/quotation-customer-extract";
-import { extractQuotationRepresentativeFields } from "@/lib/quotation-representative-extract";
+import { extractRepresentativeSnapshot } from "@/lib/quotation-representative-extract";
 
 /** Matches standard UUID strings so clients can send a template id in `template_key` by mistake. */
 const UUID_STRING_RE =
@@ -187,13 +187,25 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  const rep = extractQuotationRepresentativeFields(raw);
-  if (rep) {
+  const repSnap = extractRepresentativeSnapshot(raw);
+  if (repSnap) {
     await supabase.from("quote_representatives").insert({
       quote_id: quoteId,
-      ...rep,
+      rep_phone: repSnap.rep_phone,
+      rep_email: repSnap.rep_email,
+      rep_avatar: repSnap.rep_avatar,
+      rep_full_name: repSnap.rep_full_name,
+      rep_title: repSnap.rep_title,
     });
   }
+
+  await supabase
+    .from("quotes")
+    .update({
+      representative_snapshot: repSnap,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", quoteId);
 
   const products = Array.isArray(q.products) ? q.products : [];
   if (products.length > 0) {

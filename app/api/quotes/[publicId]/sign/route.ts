@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServiceRoleClient } from "@/lib/supabase-server";
+import {
+  mergeRepresentativeRowWithSnapshot,
+  normalizeRepresentativeSnapshot,
+} from "@/lib/quotation-representative-extract";
 
 const WEBHOOK_URL =
   "https://redcarpet.app.n8n.cloud/webhook-test/dbb8db92-f1f1-4f8a-8f02-6d88d3865df2";
@@ -55,7 +59,7 @@ export async function POST(
       .maybeSingle(),
     supabase
       .from("quote_representatives")
-      .select("rep_phone, rep_email, rep_avatar, rep_full_name")
+      .select("rep_phone, rep_email, rep_avatar, rep_full_name, rep_title")
       .eq("quote_id", quote.id)
       .maybeSingle(),
     supabase
@@ -71,7 +75,15 @@ export async function POST(
   ]);
 
   const customer = customerRes.data ?? null;
-  const representative = repRes.data ?? null;
+
+  const qRow = quote as { representative_snapshot?: unknown };
+  const repSnapshot = normalizeRepresentativeSnapshot(
+    qRow.representative_snapshot
+  );
+  const representative = mergeRepresentativeRowWithSnapshot(
+    repRes.data,
+    repSnapshot
+  );
   const products = productsRes.data ?? [];
   const paymentTerms = termsRes.data ?? [];
 

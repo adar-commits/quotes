@@ -162,7 +162,7 @@ export default async function QuotePage({
                     <div className="order-2 flex min-w-0 gap-3 border-t border-slate-100 pt-4 md:order-1 md:w-[min(100%,272px)] md:shrink-0 md:border-t-0 md:pt-0">
                       <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-slate-200/80 bg-slate-50">
                         <RepresentativeAvatar
-                          src={representative?.rep_avatar}
+                          src={representative.rep_avatar}
                           fallback={REP_AVATAR_FALLBACK}
                         />
                       </div>
@@ -174,9 +174,10 @@ export default async function QuotePage({
                           מפיק ההצעה
                         </p>
                         <p className="font-medium whitespace-pre-line text-slate-800">
-                          {representative?.rep_full_name ?? "—"}
+                          {representative.rep_full_name ?? "—"}
                         </p>
-                        {quote.agent_desc?.trim() ? (
+                        {(representative.rep_title?.trim() ||
+                          quote.agent_desc?.trim()) ? (
                           <p className="text-slate-700">
                             <span
                               style={{ color: mainColor }}
@@ -184,10 +185,12 @@ export default async function QuotePage({
                             >
                               תפקיד:{" "}
                             </span>
-                            {quote.agent_desc.trim()}
+                            {(representative.rep_title?.trim() ||
+                              quote.agent_desc?.trim()) ??
+                              ""}
                           </p>
                         ) : null}
-                        {representative?.rep_phone ? (
+                        {representative.rep_phone ? (
                           <p>
                             <span
                               style={{ color: mainColor }}
@@ -204,7 +207,7 @@ export default async function QuotePage({
                             </a>
                           </p>
                         ) : null}
-                        {representative?.rep_email?.trim() ? (
+                        {representative.rep_email?.trim() ? (
                           <p>
                             <span
                               style={{ color: mainColor }}

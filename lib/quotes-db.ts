@@ -1,4 +1,9 @@
 import { createClient } from "@supabase/supabase-js";
+import {
+  mergeRepresentativeRowWithSnapshot,
+  normalizeRepresentativeSnapshot,
+  type RepresentativeSnapshot,
+} from "@/lib/quotation-representative-extract";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -30,6 +35,8 @@ export type QuoteRow = {
   agent_desc: string | null;
   status?: string | null;
   template_id: string | null;
+  /** Last normalized representative payload from POST /api/quotes (merged with quote_representatives on read). */
+  representative_snapshot?: unknown;
 };
 
 export type QuoteCustomerRow = {
@@ -44,6 +51,7 @@ export type QuoteRepresentativeRow = {
   rep_email: string | null;
   rep_avatar: string | null;
   rep_full_name: string | null;
+  rep_title: string | null;
 };
 
 export type QuoteProductRow = {
@@ -70,7 +78,8 @@ export type QuotePaymentTermRow = {
 export type QuoteWithDetails = {
   quote: QuoteRow;
   customer: QuoteCustomerRow | null;
-  representative: QuoteRepresentativeRow | null;
+  /** Merged quote_representatives row + quotes.representative_snapshot. */
+  representative: RepresentativeSnapshot;
   products: QuoteProductRow[];
   paymentTerms: QuotePaymentTermRow[];
   template: QuoteTemplateRow | null;
@@ -116,7 +125,7 @@ export async function getQuoteByPublicId(
       .maybeSingle(),
     supabase
       .from("quote_representatives")
-      .select("rep_phone, rep_email, rep_avatar, rep_full_name")
+      .select("rep_phone, rep_email, rep_avatar, rep_full_name, rep_title")
       .eq("quote_id", quote.id)
       .maybeSingle(),
     supabase
@@ -131,10 +140,17 @@ export async function getQuoteByPublicId(
       .order("sort_order", { ascending: true }),
   ]);
 
+  const qRow = quote as QuoteRow;
+  const snapshot = normalizeRepresentativeSnapshot(
+    qRow.representative_snapshot
+  );
+  const repRow = repRes.data as QuoteRepresentativeRow | null;
+  const representative = mergeRepresentativeRowWithSnapshot(repRow, snapshot);
+
   return {
-    quote: quote as QuoteRow,
+    quote: qRow,
     customer: customerRes.data as QuoteCustomerRow | null,
-    representative: repRes.data as QuoteRepresentativeRow | null,
+    representative,
     products: (productsRes.data ?? []) as QuoteProductRow[],
     paymentTerms: (termsRes.data ?? []) as QuotePaymentTermRow[],
     template,
