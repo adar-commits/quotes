@@ -4,6 +4,7 @@ import { calculateQuoteBreakdown } from "@/lib/quote-total";
 import type { QuotationPayload } from "@/lib/quotation-types";
 import { extractQuotationCustomerFields } from "@/lib/quotation-customer-extract";
 import { extractRepresentativeSnapshot } from "@/lib/quotation-representative-extract";
+import { resolvePublicAppBase } from "@/lib/app-url";
 
 /** Matches standard UUID strings so clients can send a template id in `template_key` by mistake. */
 const UUID_STRING_RE =
@@ -239,9 +240,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const baseUrl =
-    process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ??
-    request.nextUrl.origin;
+  const baseUrl = resolvePublicAppBase(request);
   const url = `${baseUrl}/${publicId}`;
 
   const productLines = (Array.isArray(q.products) ? q.products : []).map(
