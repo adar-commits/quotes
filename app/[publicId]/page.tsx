@@ -33,9 +33,48 @@ function formatDate(iso: string | null) {
   });
 }
 
-function shortenId(id: string | null): string {
-  if (!id) return "—";
-  return id.length > 12 ? `${id.slice(0, 8)}…` : id;
+function repAvatarUsesImg(src: string): boolean {
+  return /\.svg(\?|$)/i.test(src) || src.includes("fireberry.com/app/static/media/");
+}
+
+function RepresentativeAvatar({
+  src,
+  fallback,
+}: {
+  src: string | null | undefined;
+  fallback: string;
+}) {
+  const url = src?.trim();
+  if (!url) {
+    return (
+      <Image
+        src={fallback}
+        alt=""
+        fill
+        className="object-cover"
+        sizes="64px"
+      />
+    );
+  }
+  if (repAvatarUsesImg(url)) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element -- SVG / CRM icons; next/image remote SVG is unreliable
+      <img
+        src={url}
+        alt=""
+        className="h-full w-full object-contain object-center p-1"
+      />
+    );
+  }
+  return (
+    <Image
+      src={url}
+      alt=""
+      fill
+      className="object-cover"
+      sizes="64px"
+    />
+  );
 }
 
 /** Only attributes with non-empty values from the API — no placeholder defaults. */
@@ -114,62 +153,45 @@ export default async function QuotePage({
             {/* Page 1: Chart only — banner + customer/salesperson (right) + quote details + financial summary */}
             <div className="border-b border-slate-200/60">
               <QuoteBanner bannerUrl={template?.banner_url} />
-              <div className="border-t border-slate-200/80 bg-gradient-to-b from-slate-50/90 to-white p-4 backdrop-blur-sm sm:p-6 md:p-8">
+              <div className="border-t border-slate-200/80 bg-gradient-to-b from-slate-50/90 to-white px-3 py-3 backdrop-blur-sm sm:px-5 sm:py-4 md:px-6 md:py-5">
                 <div
-                  className="rounded-2xl border border-slate-200/60 bg-white/85 p-5 shadow-sm ring-1 ring-slate-900/5 sm:p-6 md:p-8"
+                  className="rounded-xl border border-slate-200/60 bg-white/90 p-4 shadow-sm ring-1 ring-slate-900/5 sm:p-5"
                   dir="rtl"
                 >
-                  <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-10 lg:gap-14">
-                    <div className="text-right">
-                      <p
-                        className="text-[0.825rem] font-normal uppercase leading-snug tracking-wider"
-                        style={{ color: mainColor }}
-                      >
-                        מפיק ההצעה
-                      </p>
-                      <div className="relative mt-2 mr-0 ml-auto h-24 w-24 shrink-0 overflow-hidden rounded-lg border border-slate-200/80 bg-slate-50">
-                        <Image
-                          src={
-                            representative?.rep_avatar?.trim()
-                              ? representative.rep_avatar
-                              : REP_AVATAR_FALLBACK
-                          }
-                          alt=""
-                          fill
-                          className="object-cover"
-                          sizes="96px"
+                  <div className="flex flex-col gap-4 md:flex-row md:items-stretch md:gap-0">
+                    <div className="order-2 flex min-w-0 gap-3 border-t border-slate-100 pt-4 md:order-1 md:w-[min(100%,272px)] md:shrink-0 md:border-t-0 md:pt-0">
+                      <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-slate-200/80 bg-slate-50">
+                        <RepresentativeAvatar
+                          src={representative?.rep_avatar}
+                          fallback={REP_AVATAR_FALLBACK}
                         />
                       </div>
-                      <div className="mt-3 space-y-2 text-[0.825rem] leading-snug">
-                        <p>
-                          <span
-                            className="font-medium"
-                            style={{ color: mainColor }}
-                          >
-                            שם:{" "}
-                          </span>
-                          <span className="text-slate-700">
-                            {representative?.rep_full_name ?? "—"}
-                          </span>
+                      <div className="min-w-0 flex-1 space-y-1.5 text-right text-sm leading-snug">
+                        <p
+                          className="text-[0.7rem] font-medium uppercase tracking-wide text-slate-500"
+                          style={{ color: mainColor }}
+                        >
+                          מפיק ההצעה
+                        </p>
+                        <p className="font-medium whitespace-pre-line text-slate-800">
+                          {representative?.rep_full_name ?? "—"}
                         </p>
                         {quote.agent_desc?.trim() ? (
-                          <p>
+                          <p className="text-slate-700">
                             <span
-                              className="font-medium"
                               style={{ color: mainColor }}
+                              className="font-medium"
                             >
                               תפקיד:{" "}
                             </span>
-                            <span className="text-slate-700">
-                              {quote.agent_desc.trim()}
-                            </span>
+                            {quote.agent_desc.trim()}
                           </p>
                         ) : null}
                         {representative?.rep_phone ? (
                           <p>
                             <span
-                              className="font-medium"
                               style={{ color: mainColor }}
+                              className="font-medium"
                             >
                               טלפון:{" "}
                             </span>
@@ -185,8 +207,8 @@ export default async function QuotePage({
                         {representative?.rep_email?.trim() ? (
                           <p>
                             <span
-                              className="font-medium"
                               style={{ color: mainColor }}
+                              className="font-medium"
                             >
                               דוא&quot;ל:{" "}
                             </span>
@@ -201,61 +223,69 @@ export default async function QuotePage({
                         ) : null}
                       </div>
                     </div>
-                    <div className="space-y-4 text-right">
-                      <div>
-                        <p
-                          className="text-[0.825rem] font-normal uppercase leading-snug tracking-wider"
-                          style={{ color: mainColor }}
-                        >
-                          מס׳ הצעה
-                        </p>
-                        <p className="mt-1 text-[0.825rem] font-normal leading-snug text-slate-700">
-                          {quote.public_id
-                            ? quote.public_id.slice(-10)
-                            : quote.quotation_id ?? quote.invoice_id ?? "—"}
-                        </p>
+
+                    <div
+                      className="hidden w-px shrink-0 self-stretch bg-slate-200/90 md:order-2 md:mx-4 md:block"
+                      aria-hidden
+                    />
+
+                    <div className="order-1 min-w-0 space-y-2.5 text-right md:order-3 md:flex-1">
+                      <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+                        <div>
+                          <p
+                            className="text-[0.7rem] font-medium uppercase leading-tight tracking-wide text-slate-500"
+                            style={{ color: mainColor }}
+                          >
+                            מס׳ הצעה
+                          </p>
+                          <p className="mt-0.5 text-sm leading-snug text-slate-800">
+                            {quote.public_id
+                              ? quote.public_id.slice(-10)
+                              : quote.quotation_id ?? quote.invoice_id ?? "—"}
+                          </p>
+                        </div>
+                        <div>
+                          <p
+                            className="text-[0.7rem] font-medium uppercase leading-tight tracking-wide text-slate-500"
+                            style={{ color: mainColor }}
+                          >
+                            תאריך הפקה
+                          </p>
+                          <p className="mt-0.5 text-sm leading-snug text-slate-800">
+                            {formatDate(quote.invoice_creation_date)}
+                          </p>
+                        </div>
                       </div>
                       <div>
                         <p
-                          className="text-[0.825rem] font-normal uppercase leading-snug tracking-wider"
-                          style={{ color: mainColor }}
-                        >
-                          תאריך הפקה
-                        </p>
-                        <p className="mt-1 text-[0.825rem] font-normal leading-snug text-slate-700">
-                          {formatDate(quote.invoice_creation_date)}
-                        </p>
-                      </div>
-                      <div>
-                        <p
-                          className="text-[0.825rem] font-normal uppercase leading-snug tracking-wider"
+                          className="text-[0.7rem] font-medium uppercase leading-tight tracking-wide text-slate-500"
                           style={{ color: mainColor }}
                         >
                           שם הפרויקט
                         </p>
-                        <p className="mt-1 text-[0.825rem] font-normal leading-snug text-slate-700">
+                        <p className="mt-0.5 text-sm leading-snug text-slate-800">
                           {quote.project_name ?? "—"}
                         </p>
                       </div>
                       <div>
                         <p
-                          className="text-[0.825rem] font-normal uppercase leading-snug tracking-wider"
+                          className="text-[0.7rem] font-medium uppercase leading-tight tracking-wide text-slate-500"
                           style={{ color: mainColor }}
                         >
                           שם לקוח
                         </p>
-                        <p className="mt-1 text-[0.825rem] font-normal leading-snug text-slate-700">
+                        <p className="mt-0.5 text-sm leading-snug text-slate-800">
                           {(customer?.customer_name || customer?.customer_id) ??
                             "—"}
                         </p>
                         {customer?.customer_logo ? (
-                          <div className="mt-3 relative ml-auto h-16 w-auto max-w-[140px] aspect-[2/1] overflow-hidden rounded-lg border border-slate-200/80 bg-slate-50">
+                          <div className="relative ml-auto mt-2 h-12 w-auto max-w-[120px] aspect-2/1 overflow-hidden rounded-lg border border-slate-200/80 bg-slate-50">
                             <Image
                               src={customer.customer_logo}
                               alt=""
                               fill
                               className="object-contain object-right"
-                              sizes="140px"
+                              sizes="120px"
                             />
                           </div>
                         ) : null}
