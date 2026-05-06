@@ -184,20 +184,6 @@ export default async function QuotePage({
                         <p className="font-medium whitespace-pre-line text-slate-800">
                           {meaningfulLine(representative.rep_full_name) ?? "—"}
                         </p>
-                        {(representative.rep_title?.trim() ||
-                          quote.agent_desc?.trim()) ? (
-                          <p className="text-slate-700">
-                            <span
-                              style={{ color: mainColor }}
-                              className="font-medium"
-                            >
-                              תפקיד:{" "}
-                            </span>
-                            {(representative.rep_title?.trim() ||
-                              quote.agent_desc?.trim()) ??
-                              ""}
-                          </p>
-                        ) : null}
                         {representative.rep_phone ? (
                           <p>
                             <span
@@ -212,23 +198,6 @@ export default async function QuotePage({
                               style={{ WebkitTapHighlightColor: "transparent" }}
                             >
                               {representative.rep_phone}
-                            </a>
-                          </p>
-                        ) : null}
-                        {representative.rep_email?.trim() ? (
-                          <p>
-                            <span
-                              style={{ color: mainColor }}
-                              className="font-medium"
-                            >
-                              דוא&quot;ל:{" "}
-                            </span>
-                            <a
-                              href={`mailto:${representative.rep_email.trim()}`}
-                              className="text-slate-700 underline-offset-2 transition-colors hover:text-slate-900 hover:underline"
-                              style={{ WebkitTapHighlightColor: "transparent" }}
-                            >
-                              {representative.rep_email.trim()}
                             </a>
                           </p>
                         ) : null}
@@ -266,6 +235,17 @@ export default async function QuotePage({
                             {formatDate(quote.invoice_creation_date)}
                           </p>
                         </div>
+                      </div>
+                      <div>
+                        <p
+                          className="text-[0.7rem] font-medium uppercase leading-tight tracking-wide text-slate-500"
+                          style={{ color: mainColor }}
+                        >
+                          לכבוד
+                        </p>
+                        <p className="mt-0.5 text-sm leading-snug text-slate-800">
+                          {quote.agent_desc?.trim() || "—"}
+                        </p>
                       </div>
                       <div>
                         <p
