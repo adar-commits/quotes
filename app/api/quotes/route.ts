@@ -19,35 +19,7 @@ import {
   vatNumber,
 } from "@/lib/quotation-payload-aliases";
 import { resolvePublicAppBase } from "@/lib/app-url";
-
-/**
- * Old integrations wrapped the quote in `{ "json": "<stringified quote>" }`.
- * Unwrap so `customerName`, `Representative`, etc. inside the string are visible to parsers.
- */
-function unwrapLegacyQuotePayload(input: unknown): Record<string, unknown> {
-  if (!input || typeof input !== "object" || Array.isArray(input)) {
-    return {};
-  }
-  const o = input as Record<string, unknown>;
-  const jsonStr = o.json;
-  if (typeof jsonStr !== "string") {
-    return o;
-  }
-  const trimmed = jsonStr.trim();
-  if (!trimmed.startsWith("{") && !trimmed.startsWith("[")) {
-    return o;
-  }
-  try {
-    const parsed: unknown = JSON.parse(jsonStr);
-    if (parsed == null || typeof parsed !== "object") return o;
-    const inner = Array.isArray(parsed) ? parsed[0] : parsed;
-    if (!inner || typeof inner !== "object" || Array.isArray(inner)) return o;
-    const { json: _json, ...wrapperRest } = o;
-    return { ...wrapperRest, ...(inner as Record<string, unknown>) };
-  } catch {
-    return o;
-  }
-}
+import { normalizeQuoteRequestRoot } from "@/lib/quotation-request-root";
 
 /** Some clients send `[[{...}]]`; peel single-element array wrappers until we hit an object. */
 function unwrapNestedSingletonArrays(input: unknown): unknown {
@@ -75,7 +47,8 @@ function parseInvoiceDate(value: string): string | null {
 export async function POST(request: NextRequest) {
   let body: unknown;
   try {
-    body = await request.json();
+    const text = await request.text();
+    body = JSON.parse(text.replace(/^\uFEFF/, ""));
   } catch {
     return NextResponse.json(
       { error: "Invalid JSON body" },
@@ -95,7 +68,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const root = unwrapLegacyQuotePayload(peeled as Record<string, unknown>);
+  const root = normalizeQuoteRequestRoot(peeled as Record<string, unknown>);
   const vat = vatNumber(root);
   if (vat === undefined) {
     return NextResponse.json(
@@ -171,7 +144,7 @@ export async function POST(request: NextRequest) {
     quoteId = existing.id;
     publicId = existing.public_id;
 
-    await supabase
+    const { error: updateErr } = await supabase
       .from("quotes")
       .update({
         vat,
@@ -187,6 +160,13 @@ export async function POST(request: NextRequest) {
         updated_at: new Date().toISOString(),
       })
       .eq("id", quoteId);
+    if (updateErr) {
+      console.error("quotes update:", updateErr);
+      return NextResponse.json(
+        { error: "Failed to update quote" },
+        { status: 500 }
+      );
+    }
 
     await supabase.from("quote_customers").delete().eq("quote_id", quoteId);
     await supabase.from("quote_representatives").delete().eq("quote_id", quoteId);
