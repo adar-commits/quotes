@@ -35,6 +35,15 @@ function unwrapLegacyQuotePayload(input: unknown): Record<string, unknown> {
   }
 }
 
+/** Some clients send `[[{...}]]`; peel single-element array wrappers until we hit an object. */
+function unwrapNestedSingletonArrays(input: unknown): unknown {
+  let cur = input;
+  while (Array.isArray(cur) && cur.length === 1) {
+    cur = cur[0];
+  }
+  return cur;
+}
+
 /** Matches standard UUID strings so clients can send a template id in `template_key` by mistake. */
 const UUID_STRING_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -60,15 +69,19 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const bodyElement = Array.isArray(body) ? body[0] : body;
-  if (!bodyElement || typeof bodyElement !== "object") {
+  const first = Array.isArray(body) ? body[0] : body;
+  const peeled = unwrapNestedSingletonArrays(first);
+  if (peeled == null || typeof peeled !== "object" || Array.isArray(peeled)) {
     return NextResponse.json(
-      { error: "Body must be a quote object or array with one quote object" },
+      {
+        error:
+          "Body must be a quote object or array with one quote object",
+      },
       { status: 400 }
     );
   }
 
-  const root = unwrapLegacyQuotePayload(bodyElement);
+  const root = unwrapLegacyQuotePayload(peeled as Record<string, unknown>);
   const q = root as QuotationPayload;
   if (typeof q.vat !== "number") {
     return NextResponse.json(
@@ -203,12 +216,19 @@ export async function POST(request: NextRequest) {
     customer_name ||
     customer_address != null
   ) {
-    await supabase.from("quote_customers").insert({
+    const { error: custErr } = await supabase.from("quote_customers").insert({
       quote_id: quoteId,
       customer_id: customer_id ?? null,
       customer_name: customer_name ?? null,
       customer_address: customer_address,
     });
+    if (custErr) {
+      console.error("quote_customers insert:", custErr);
+      return NextResponse.json(
+        { error: "Failed to save customer details" },
+        { status: 500 }
+      );
+    }
   }
 
   const repSnap = extractRepresentativeSnapshot(root);

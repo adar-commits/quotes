@@ -3,6 +3,26 @@
  * Accepts common variants: camelCase, snake_case, PascalCase, string `customer`, etc.
  */
 
+/**
+ * Some CRMs send `customer` as a stringified JSON object instead of a nested object.
+ * Normalize so merge/extraction see real keys (`customerName`, etc.).
+ */
+export function normalizeCustomerPayload(
+  raw: Record<string, unknown>
+): Record<string, unknown> {
+  const c = raw.customer;
+  if (typeof c !== "string") return raw;
+  const t = c.trim();
+  if (!t.startsWith("{")) return raw;
+  try {
+    const parsed: unknown = JSON.parse(t);
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return raw;
+    return { ...raw, customer: parsed as Record<string, unknown> };
+  } catch {
+    return raw;
+  }
+}
+
 /** Merge nested customer-like objects (`customer`, `Customer`, `client`, …). Later sources override earlier. */
 export function mergeCustomerNestedObjects(
   raw: Record<string, unknown>
@@ -34,20 +54,21 @@ export function extractQuotationCustomerFields(raw: Record<string, unknown>): {
   customer_name: string | null;
   customer_address: string | null;
 } {
-  const nested = mergeCustomerNestedObjects(raw);
+  const rawNorm = normalizeCustomerPayload(raw);
+  const nested = mergeCustomerNestedObjects(rawNorm);
 
   const customerFromRootString =
-    typeof raw.customer === "string"
-      ? firstNonEmptyString(raw.customer)
+    typeof rawNorm.customer === "string"
+      ? firstNonEmptyString(rawNorm.customer)
       : null;
 
   const customer_id = firstNonEmptyString(
     nested.customerID,
     nested.customer_id,
     nested.CustomerID,
-    raw.customerID,
-    raw.customer_id,
-    raw.CustomerID
+    rawNorm.customerID,
+    rawNorm.customer_id,
+    rawNorm.CustomerID
   );
 
   const customer_name = firstNonEmptyString(
@@ -61,14 +82,14 @@ export function extractQuotationCustomerFields(raw: Record<string, unknown>): {
     nested.ClientName,
     nested.companyName,
     nested.CompanyName,
-    raw.customerName,
-    raw.customer_name,
-    raw.CustomerName,
-    raw.clientName,
-    raw.client_name,
-    raw.ClientName,
-    raw.companyName,
-    raw.CompanyName,
+    rawNorm.customerName,
+    rawNorm.customer_name,
+    rawNorm.CustomerName,
+    rawNorm.clientName,
+    rawNorm.client_name,
+    rawNorm.ClientName,
+    rawNorm.companyName,
+    rawNorm.CompanyName,
     customerFromRootString
   );
 
@@ -76,9 +97,9 @@ export function extractQuotationCustomerFields(raw: Record<string, unknown>): {
     nested.customerAddress ??
     nested.customer_address ??
     nested.CustomerAddress ??
-    raw.customerAddress ??
-    raw.customer_address ??
-    raw.CustomerAddress;
+    rawNorm.customerAddress ??
+    rawNorm.customer_address ??
+    rawNorm.CustomerAddress;
 
   const customer_address =
     addressCandidate === undefined || addressCandidate === null

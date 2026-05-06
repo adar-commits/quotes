@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { unstable_noStore as noStore } from "next/cache";
 import {
   mergeRepresentativeRowWithSnapshot,
   normalizeRepresentativeSnapshot,
@@ -88,6 +89,7 @@ export type QuoteWithDetails = {
 export async function getQuoteByPublicId(
   publicId: string
 ): Promise<QuoteWithDetails | null> {
+  noStore();
   const supabase = createClient(url, anonKey);
 
   const { data: quote, error: quoteError } = await supabase

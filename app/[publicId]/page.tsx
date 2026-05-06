@@ -10,6 +10,8 @@ import ContactStrip from "./ContactStrip";
 import ProductImageWithLightbox from "./ProductImageWithLightbox";
 import QuoteBanner from "./QuoteBanner";
 
+export const dynamic = "force-dynamic";
+
 const DEFAULT_MAIN = "#801a1e";
 
 const REP_AVATAR_FALLBACK =
