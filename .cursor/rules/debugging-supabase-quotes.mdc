@@ -1,0 +1,64 @@
+---
+description: Debugging methodology for Supabase-backed quote bugs ("data is in JSON but page is empty", "API keeps creating new rows instead of upserting"). Forces DB-first investigation before code-only theories.
+alwaysApply: true
+---
+
+# Debug DB-backed bugs from the database first, not from the JSON
+
+When a bug looks like "field X is in the request but the page shows nothing" or
+"upsert keeps creating new rows," **stop guessing about parsers** and check the
+real Postgres state via the Supabase MCP. Skipping this step has burned hours.
+
+## Mandatory first checks (use the `plugin-supabase-supabase` MCP)
+
+1. `list_projects` → confirm the right project (this repo: **`swtymqcboxmirjzjrqjm`** — "Quotes").
+2. `execute_sql` to introspect schema vs. code SELECTs:
+   ```sql
+   select table_name, column_name
+   from information_schema.columns
+   where table_schema='public' and table_name in (
+     'quotes','quote_customers','quote_representatives',
+     'quote_products','quote_payment_terms','quote_templates'
+   );
+   ```
+   Compare with every `.select("a, b, c")` in `lib/quotes-db.ts` and `app/api/**`.
+   **Any column referenced in code that is missing in DB causes the whole row read
+   to return `{ data: null }`** → the UI silently renders empty / "—".
+3. Read the actual row(s) the user is complaining about:
+   ```sql
+   select * from quotes where public_id = '...';
+   select * from quote_customers where quote_id = '...';
+   ```
+4. Check `pg_policies` for the affected tables before suspecting RLS.
+5. For "creates a new quote every time," check duplicates and the lookup key:
+   ```sql
+   select invoice_id, count(*) from quotes
+   where invoice_id is not null group by 1 having count(*) > 1;
+   ```
+
+## Common root causes we have actually hit (do not re-debug as code)
+
+- **Schema drift** — migration files in `supabase/migrations/` were never applied
+  to the live project. Apply with the MCP `apply_migration` tool, **not** by
+  pasting into the SQL editor.
+- **Duplicate rows on an "upsert key"** — lookup with `.in(...).limit(1)` is
+  non-deterministic without `.order(...)`, so each POST returns a different
+  `public_id`. Fix: keep the oldest row per key, add a `UNIQUE INDEX ... WHERE
+  invoice_id IS NOT NULL AND invoice_id <> ''`, and `.order("created_at",
+  { ascending: true })` in the lookup.
+- **Silent Supabase errors** — `const { data, error } = ...` where `error` is
+  ignored. Log and surface 500 instead of treating `data: null` as "no row."
+
+## Quote upsert contract
+
+`POST /api/quotes` MUST upsert by **`invoice_id`** (with all camelCase /
+snake_case spellings handled in `lib/quotation-payload-aliases.ts`). The
+canonical row per `invoice_id` is the **oldest** one. Public URL = `/<public_id>`
+of that canonical row, and it MUST stay stable across re-POSTs.
+
+## Before claiming "fixed"
+
+1. Run the failing payload again locally or in prod.
+2. `WebFetch` the resulting `https://quotes.carpetshop.co.il/<public_id>` and
+   grep the rendered text for the expected value (e.g. `שם לקוח` content).
+3. Only then report success.
