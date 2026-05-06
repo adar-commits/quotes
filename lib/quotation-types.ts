@@ -19,8 +19,10 @@ type QuotationPayloadCore = {
     additionalDesc: string | null;
   }>;
   agentCode: string | null;
-  /** Display line for לכבוד; API also accepts `agent_desc`. */
+  /** Sales rep / producer name; API also accepts `agent_desc`. */
   agentDesc: string | null;
+  /** לכבוד (attention). Also `honorific_line`, `attention`, or root key `לכבוד`. */
+  honorificLine?: string | null;
   /** Invoice reference for upsert matching. API accepts `invoiceID`, `invoiceId`, `invoice_id`, … — see `lib/quotation-payload-aliases.ts`. */
   invoiceID: string;
   projectName: string;

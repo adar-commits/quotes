@@ -63,6 +63,26 @@ export function agentDescForDb(raw: Record<string, unknown>): string | null {
   );
 }
 
+/** לכבוד / attention — separate from agent (sales rep) when both are sent. */
+export function honorificLineForDb(raw: Record<string, unknown>): string | null {
+  const hebrewKey = raw["לכבוד"] as unknown;
+  return (
+    firstNonEmptyString(
+      raw.honorificLine,
+      raw.honorific_line,
+      raw.honorific,
+      raw.attentionLine,
+      raw.attention_line,
+      raw.attention,
+      raw.toWhom,
+      raw.to_whom,
+      raw.billingAttention,
+      raw.billing_attention,
+      hebrewKey
+    ) ?? null
+  );
+}
+
 export function projectNameForDb(raw: Record<string, unknown>): string | null {
   return (
     firstNonEmptyString(

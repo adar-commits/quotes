@@ -246,7 +246,9 @@ export default async function QuotePage({
                           לכבוד
                         </p>
                         <p className="mt-0.5 text-sm leading-snug text-slate-800">
-                          {quote.agent_desc?.trim() || "—"}
+                          {meaningfulLine(quote.honorific_line) ||
+                            meaningfulLine(quote.agent_desc) ||
+                            "—"}
                         </p>
                       </div>
                       <div>

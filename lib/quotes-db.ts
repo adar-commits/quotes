@@ -34,6 +34,7 @@ export type QuoteRow = {
   invoice_creation_date: string | null;
   agent_code: string | null;
   agent_desc: string | null;
+  honorific_line?: string | null;
   status?: string | null;
   template_id: string | null;
   /** Last normalized representative payload from POST /api/quotes (merged with quote_representatives on read). */

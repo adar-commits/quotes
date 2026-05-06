@@ -7,6 +7,7 @@ import { extractRepresentativeSnapshot } from "@/lib/quotation-representative-ex
 import {
   agentCodeForDb,
   agentDescForDb,
+  honorificLineForDb,
   invoiceCreationDateString,
   invoiceIdForStorage,
   invoiceIdLookupVariants,
@@ -156,6 +157,7 @@ export async function POST(request: NextRequest) {
         invoice_creation_date: parseInvoiceDate(invoiceCreationDateString(root)),
         agent_code: agentCodeForDb(root),
         agent_desc: agentDescForDb(root),
+        honorific_line: honorificLineForDb(root),
         template_id: templateId,
         updated_at: new Date().toISOString(),
       })
@@ -185,6 +187,7 @@ export async function POST(request: NextRequest) {
         invoice_creation_date: parseInvoiceDate(invoiceCreationDateString(root)),
         agent_code: agentCodeForDb(root),
         agent_desc: agentDescForDb(root),
+        honorific_line: honorificLineForDb(root),
         template_id: templateId,
       })
       .select("id, public_id")
