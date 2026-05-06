@@ -9,6 +9,52 @@ export type RepresentativeSnapshot = {
   rep_avatar: string | null;
 };
 
+/** CRM sometimes sends rep fields at the root instead of under `Representative`. */
+function representativeRootFlat(raw: Record<string, unknown>): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  const set = (canonical: string, ...vals: unknown[]) => {
+    const s = firstNonEmptyString(...vals);
+    if (s) out[canonical] = s;
+  };
+  set(
+    "repFullName",
+    raw.repFullName,
+    raw.rep_full_name,
+    raw.RepFullName
+  );
+  set(
+    "repTitle",
+    raw.repTitle,
+    raw.rep_title,
+    raw.RepTitle,
+    raw.title,
+    raw.Title,
+    raw.jobTitle,
+    raw.JobTitle
+  );
+  set(
+    "repPhone",
+    raw.repPhone,
+    raw.rep_phone,
+    raw.RepPhone,
+    raw.phone,
+    raw.Phone,
+    raw.mobile,
+    raw.Mobile
+  );
+  set("repEmail", raw.repEmail, raw.rep_email, raw.RepEmail, raw.email, raw.Email);
+  set(
+    "repAvatar",
+    raw.repAvatar,
+    raw.rep_avatar,
+    raw.RepAvatar,
+    raw.avatar,
+    raw.pictureUrl,
+    raw.pictureurl
+  );
+  return out;
+}
+
 function representativeBlock(
   raw: Record<string, unknown>
 ): Record<string, unknown> | null {
@@ -19,6 +65,13 @@ function representativeBlock(
 
   if (!b || typeof b !== "object" || Array.isArray(b)) return null;
   return b as Record<string, unknown>;
+}
+
+/** Merges root-level rep fields with `Representative` (block properties win). */
+function mergedRepresentativeSource(raw: Record<string, unknown>): Record<string, unknown> {
+  const fromRoot = representativeRootFlat(raw);
+  const block = representativeBlock(raw);
+  return { ...fromRoot, ...(block ?? {}) };
 }
 
 /**
@@ -80,12 +133,12 @@ export function normalizeRepresentativeSnapshot(
   };
 }
 
-/** Reads CRM-style `Representative` / `representative` object with common aliases. */
+/** Reads CRM-style `Representative` / `representative` object with common aliases. Root-level `repFullName`, `repPhone`, etc. are accepted when the nested block is absent or partial. */
 export function extractRepresentativeSnapshot(
   raw: Record<string, unknown>
 ): RepresentativeSnapshot | null {
-  const o = representativeBlock(raw);
-  if (!o) return null;
+  const o = mergedRepresentativeSource(raw);
+  if (Object.keys(o).length === 0) return null;
 
   const rep_full_name =
     firstNonEmptyString(

@@ -33,6 +33,14 @@ function formatDate(iso: string | null) {
   });
 }
 
+/** Hide punctuation-only placeholders stored by upstream systems (e.g. ","). */
+function meaningfulLine(s: string | null | undefined): string | null {
+  const t = typeof s === "string" ? s.trim() : "";
+  if (!t) return null;
+  if (/^[,;:.!?\-–—\s]+$/u.test(t)) return null;
+  return t;
+}
+
 function repAvatarUsesImg(src: string): boolean {
   return /\.svg(\?|$)/i.test(src) || src.includes("fireberry.com/app/static/media/");
 }
@@ -174,7 +182,7 @@ export default async function QuotePage({
                           מפיק ההצעה
                         </p>
                         <p className="font-medium whitespace-pre-line text-slate-800">
-                          {representative.rep_full_name ?? "—"}
+                          {meaningfulLine(representative.rep_full_name) ?? "—"}
                         </p>
                         {(representative.rep_title?.trim() ||
                           quote.agent_desc?.trim()) ? (
@@ -278,7 +286,8 @@ export default async function QuotePage({
                           שם לקוח
                         </p>
                         <p className="mt-0.5 text-sm leading-snug text-slate-800">
-                          {(customer?.customer_name || customer?.customer_id) ??
+                          {(meaningfulLine(customer?.customer_name) ||
+                            customer?.customer_id?.trim()) ??
                             "—"}
                         </p>
                         {customer?.customer_logo ? (

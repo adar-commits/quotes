@@ -6,6 +6,35 @@ import { extractQuotationCustomerFields } from "@/lib/quotation-customer-extract
 import { extractRepresentativeSnapshot } from "@/lib/quotation-representative-extract";
 import { resolvePublicAppBase } from "@/lib/app-url";
 
+/**
+ * Old integrations wrapped the quote in `{ "json": "<stringified quote>" }`.
+ * Unwrap so `customerName`, `Representative`, etc. inside the string are visible to parsers.
+ */
+function unwrapLegacyQuotePayload(input: unknown): Record<string, unknown> {
+  if (!input || typeof input !== "object" || Array.isArray(input)) {
+    return {};
+  }
+  const o = input as Record<string, unknown>;
+  const jsonStr = o.json;
+  if (typeof jsonStr !== "string") {
+    return o;
+  }
+  const trimmed = jsonStr.trim();
+  if (!trimmed.startsWith("{") && !trimmed.startsWith("[")) {
+    return o;
+  }
+  try {
+    const parsed: unknown = JSON.parse(jsonStr);
+    if (parsed == null || typeof parsed !== "object") return o;
+    const inner = Array.isArray(parsed) ? parsed[0] : parsed;
+    if (!inner || typeof inner !== "object" || Array.isArray(inner)) return o;
+    const { json: _json, ...wrapperRest } = o;
+    return { ...wrapperRest, ...(inner as Record<string, unknown>) };
+  } catch {
+    return o;
+  }
+}
+
 /** Matches standard UUID strings so clients can send a template id in `template_key` by mistake. */
 const UUID_STRING_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -31,15 +60,16 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const raw = Array.isArray(body) ? body[0] : body;
-  if (!raw || typeof raw !== "object") {
+  const bodyElement = Array.isArray(body) ? body[0] : body;
+  if (!bodyElement || typeof bodyElement !== "object") {
     return NextResponse.json(
       { error: "Body must be a quote object or array with one quote object" },
       { status: 400 }
     );
   }
 
-  const q = raw as QuotationPayload;
+  const root = unwrapLegacyQuotePayload(bodyElement);
+  const q = root as QuotationPayload;
   if (typeof q.vat !== "number") {
     return NextResponse.json(
       { error: "Missing or invalid vat" },
@@ -51,8 +81,8 @@ export async function POST(request: NextRequest) {
   const quotationId = (q.quotationID ?? "").trim();
 
   let templateId: string | null = null;
-  const rawTemplateId = (raw as { template_id?: string | null }).template_id;
-  const rawTemplateKey = (raw as { template_key?: string | null }).template_key;
+  const rawTemplateId = (root as { template_id?: string | null }).template_id;
+  const rawTemplateKey = (root as { template_key?: string | null }).template_key;
   if (rawTemplateId && typeof rawTemplateId === "string") {
     templateId = rawTemplateId.trim();
   } else if (rawTemplateKey && typeof rawTemplateKey === "string") {
@@ -163,17 +193,11 @@ export async function POST(request: NextRequest) {
     publicId = quoteRow.public_id;
   }
 
-  const root = raw as Record<string, unknown>;
-  const nested =
-    q.customer && typeof q.customer === "object" && !Array.isArray(q.customer)
-      ? (q.customer as Record<string, unknown>)
-      : ({} as Record<string, unknown>);
-
   const {
     customer_id,
     customer_name,
     customer_address,
-  } = extractQuotationCustomerFields(root, nested);
+  } = extractQuotationCustomerFields(root);
 
   if (
     customer_id ||
@@ -188,7 +212,7 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  const repSnap = extractRepresentativeSnapshot(raw);
+  const repSnap = extractRepresentativeSnapshot(root);
   if (repSnap) {
     await supabase.from("quote_representatives").insert({
       quote_id: quoteId,
