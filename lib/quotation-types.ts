@@ -19,7 +19,9 @@ type QuotationPayloadCore = {
     additionalDesc: string | null;
   }>;
   agentCode: string | null;
+  /** Display line for לכבוד; API also accepts `agent_desc`. */
   agentDesc: string | null;
+  /** Invoice reference for upsert matching. API accepts `invoiceID`, `invoiceId`, `invoice_id`, … — see `lib/quotation-payload-aliases.ts`. */
   invoiceID: string;
   projectName: string;
   quotationID: string;

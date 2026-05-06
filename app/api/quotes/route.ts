@@ -4,6 +4,20 @@ import { calculateQuoteBreakdown } from "@/lib/quote-total";
 import type { QuotationPayload } from "@/lib/quotation-types";
 import { extractQuotationCustomerFields } from "@/lib/quotation-customer-extract";
 import { extractRepresentativeSnapshot } from "@/lib/quotation-representative-extract";
+import {
+  agentCodeForDb,
+  agentDescForDb,
+  invoiceCreationDateString,
+  invoiceIdForStorage,
+  invoiceIdLookupVariants,
+  paymentsTermsArray,
+  productsArray,
+  projectNameForDb,
+  quotationIdForLookup,
+  requireSignatureBool,
+  specialDiscountNumber,
+  vatNumber,
+} from "@/lib/quotation-payload-aliases";
 import { resolvePublicAppBase } from "@/lib/app-url";
 
 /**
@@ -82,8 +96,8 @@ export async function POST(request: NextRequest) {
   }
 
   const root = unwrapLegacyQuotePayload(peeled as Record<string, unknown>);
-  const q = root as QuotationPayload;
-  if (typeof q.vat !== "number") {
+  const vat = vatNumber(root);
+  if (vat === undefined) {
     return NextResponse.json(
       { error: "Missing or invalid vat" },
       { status: 400 }
@@ -91,8 +105,8 @@ export async function POST(request: NextRequest) {
   }
 
   const supabase = createServiceRoleClient();
-  const quotationId = (q.quotationID ?? "").trim();
-  const invoiceId = (q.invoiceID ?? "").trim();
+  const quotationId = quotationIdForLookup(root);
+  const invoiceVariants = invoiceIdLookupVariants(root);
 
   let templateId: string | null = null;
   const rawTemplateId = (root as { template_id?: string | null }).template_id;
@@ -134,11 +148,11 @@ export async function POST(request: NextRequest) {
     if (data) existing = data;
   }
 
-  if (!existing && invoiceId) {
+  if (!existing && invoiceVariants.length > 0) {
     const { data: rows, error: invErr } = await supabase
       .from("quotes")
       .select("id, public_id")
-      .eq("invoice_id", invoiceId)
+      .in("invoice_id", invoiceVariants)
       .limit(1);
     if (invErr) {
       return NextResponse.json(
@@ -151,6 +165,7 @@ export async function POST(request: NextRequest) {
   }
 
   const quotationIdForRow = quotationId || null;
+  const invoiceIdStored = invoiceIdForStorage(root);
 
   if (existing) {
     quoteId = existing.id;
@@ -159,15 +174,15 @@ export async function POST(request: NextRequest) {
     await supabase
       .from("quotes")
       .update({
-        vat: q.vat,
-        invoice_id: q.invoiceID ?? null,
-        project_name: q.projectName ?? null,
+        vat,
+        invoice_id: invoiceIdStored,
+        project_name: projectNameForDb(root),
         quotation_id: quotationIdForRow,
-        special_discount: q.specialDiscount ?? 0,
-        require_signature: q.requireSignature ?? true,
-        invoice_creation_date: parseInvoiceDate(q.invoiceCreationDate ?? ""),
-        agent_code: q.agentCode ?? null,
-        agent_desc: q.agentDesc ?? null,
+        special_discount: specialDiscountNumber(root),
+        require_signature: requireSignatureBool(root),
+        invoice_creation_date: parseInvoiceDate(invoiceCreationDateString(root)),
+        agent_code: agentCodeForDb(root),
+        agent_desc: agentDescForDb(root),
         template_id: templateId,
         updated_at: new Date().toISOString(),
       })
@@ -181,15 +196,15 @@ export async function POST(request: NextRequest) {
     const { data: quoteRow, error: quoteError } = await supabase
       .from("quotes")
       .insert({
-        vat: q.vat,
-        invoice_id: q.invoiceID ?? null,
-        project_name: q.projectName ?? null,
+        vat,
+        invoice_id: invoiceIdStored,
+        project_name: projectNameForDb(root),
         quotation_id: quotationIdForRow,
-        special_discount: q.specialDiscount ?? 0,
-        require_signature: q.requireSignature ?? true,
-        invoice_creation_date: parseInvoiceDate(q.invoiceCreationDate ?? ""),
-        agent_code: q.agentCode ?? null,
-        agent_desc: q.agentDesc ?? null,
+        special_discount: specialDiscountNumber(root),
+        require_signature: requireSignatureBool(root),
+        invoice_creation_date: parseInvoiceDate(invoiceCreationDateString(root)),
+        agent_code: agentCodeForDb(root),
+        agent_desc: agentDescForDb(root),
         template_id: templateId,
       })
       .select("id, public_id")
@@ -251,7 +266,7 @@ export async function POST(request: NextRequest) {
     })
     .eq("id", quoteId);
 
-  const products = Array.isArray(q.products) ? q.products : [];
+  const products = productsArray(root) as QuotationPayload["products"];
   if (products.length > 0) {
     await supabase.from("quote_products").insert(
       products.map((p, i) => ({
@@ -272,7 +287,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const terms = Array.isArray(q.paymentsTerms) ? q.paymentsTerms : [];
+  const terms = paymentsTermsArray(root) as string[];
   if (terms.length > 0) {
     await supabase.from("quote_payment_terms").insert(
       terms.map((term, i) => ({
@@ -286,16 +301,14 @@ export async function POST(request: NextRequest) {
   const baseUrl = resolvePublicAppBase(request);
   const url = `${baseUrl}/${publicId}`;
 
-  const productLines = (Array.isArray(q.products) ? q.products : []).map(
-    (p) => ({
-      qty: p.Qty ?? 0,
-      unitPrice: p.unitPrice ?? 0,
-      unitDiscount: p.unitDiscount ?? 0,
-    })
-  );
+  const productLines = products.map((p) => ({
+    qty: p.Qty ?? 0,
+    unitPrice: p.unitPrice ?? 0,
+    unitDiscount: p.unitDiscount ?? 0,
+  }));
   const { total } = calculateQuoteBreakdown({
-    vat: q.vat,
-    specialDiscount: q.specialDiscount ?? 0,
+    vat,
+    specialDiscount: specialDiscountNumber(root),
     lines: productLines,
   });
 
