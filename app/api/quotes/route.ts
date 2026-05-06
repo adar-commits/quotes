@@ -79,6 +79,7 @@ export async function POST(request: NextRequest) {
 
   const supabase = createServiceRoleClient();
   const quotationId = (q.quotationID ?? "").trim();
+  const invoiceId = (q.invoiceID ?? "").trim();
 
   let templateId: string | null = null;
   const rawTemplateId = (root as { template_id?: string | null }).template_id;
@@ -105,26 +106,50 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  // If quotation_id (e.g. OP-xxx) is sent and exists, update that quote instead of creating
+  // Upsert: match existing row by quotation_id first, then by invoice_id; otherwise insert.
   let quoteId: string;
   let publicId: string;
 
+  let existing: { id: string; public_id: string } | null = null;
+
   if (quotationId) {
-    const { data: existing } = await supabase
+    const { data } = await supabase
       .from("quotes")
       .select("id, public_id")
       .eq("quotation_id", quotationId)
       .maybeSingle();
+    if (data) existing = data;
+  }
 
-    if (existing) {
-      quoteId = existing.id;
-      publicId = existing.public_id;
+  if (!existing && invoiceId) {
+    const { data: rows, error: invErr } = await supabase
+      .from("quotes")
+      .select("id, public_id")
+      .eq("invoice_id", invoiceId)
+      .limit(1);
+    if (invErr) {
+      return NextResponse.json(
+        { error: invErr.message ?? "Failed to look up quote by invoiceID" },
+        { status: 500 }
+      );
+    }
+    const row = rows?.[0];
+    if (row) existing = row;
+  }
 
-      await supabase.from("quotes").update({
+  const quotationIdForRow = quotationId || null;
+
+  if (existing) {
+    quoteId = existing.id;
+    publicId = existing.public_id;
+
+    await supabase
+      .from("quotes")
+      .update({
         vat: q.vat,
         invoice_id: q.invoiceID ?? null,
         project_name: q.projectName ?? null,
-        quotation_id: quotationId,
+        quotation_id: quotationIdForRow,
         special_discount: q.specialDiscount ?? 0,
         require_signature: q.requireSignature ?? true,
         invoice_creation_date: parseInvoiceDate(q.invoiceCreationDate ?? ""),
@@ -132,39 +157,13 @@ export async function POST(request: NextRequest) {
         agent_desc: q.agentDesc ?? null,
         template_id: templateId,
         updated_at: new Date().toISOString(),
-      }).eq("id", quoteId);
+      })
+      .eq("id", quoteId);
 
-      await supabase.from("quote_customers").delete().eq("quote_id", quoteId);
-      await supabase.from("quote_representatives").delete().eq("quote_id", quoteId);
-      await supabase.from("quote_products").delete().eq("quote_id", quoteId);
-      await supabase.from("quote_payment_terms").delete().eq("quote_id", quoteId);
-    } else {
-      const { data: quoteRow, error: quoteError } = await supabase
-        .from("quotes")
-        .insert({
-          vat: q.vat,
-          invoice_id: q.invoiceID ?? null,
-          project_name: q.projectName ?? null,
-          quotation_id: quotationId,
-          special_discount: q.specialDiscount ?? 0,
-          require_signature: q.requireSignature ?? true,
-          invoice_creation_date: parseInvoiceDate(q.invoiceCreationDate ?? ""),
-          agent_code: q.agentCode ?? null,
-          agent_desc: q.agentDesc ?? null,
-          template_id: templateId,
-        })
-        .select("id, public_id")
-        .single();
-
-      if (quoteError || !quoteRow) {
-        return NextResponse.json(
-          { error: quoteError?.message ?? "Failed to create quote" },
-          { status: 500 }
-        );
-      }
-      quoteId = quoteRow.id;
-      publicId = quoteRow.public_id;
-    }
+    await supabase.from("quote_customers").delete().eq("quote_id", quoteId);
+    await supabase.from("quote_representatives").delete().eq("quote_id", quoteId);
+    await supabase.from("quote_products").delete().eq("quote_id", quoteId);
+    await supabase.from("quote_payment_terms").delete().eq("quote_id", quoteId);
   } else {
     const { data: quoteRow, error: quoteError } = await supabase
       .from("quotes")
@@ -172,7 +171,7 @@ export async function POST(request: NextRequest) {
         vat: q.vat,
         invoice_id: q.invoiceID ?? null,
         project_name: q.projectName ?? null,
-        quotation_id: null,
+        quotation_id: quotationIdForRow,
         special_discount: q.specialDiscount ?? 0,
         require_signature: q.requireSignature ?? true,
         invoice_creation_date: parseInvoiceDate(q.invoiceCreationDate ?? ""),
