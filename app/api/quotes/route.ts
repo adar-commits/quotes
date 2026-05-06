@@ -123,10 +123,14 @@ export async function POST(request: NextRequest) {
   }
 
   if (!existing && invoiceVariants.length > 0) {
+    // Deterministic: oldest row per invoice_id wins, so the same `public_id`
+    // is reused on every subsequent POST (a unique partial index also enforces
+    // one-row-per-invoice_id at the DB level).
     const { data: rows, error: invErr } = await supabase
       .from("quotes")
       .select("id, public_id")
       .in("invoice_id", invoiceVariants)
+      .order("created_at", { ascending: true })
       .limit(1);
     if (invErr) {
       return NextResponse.json(
