@@ -238,19 +238,25 @@ export default async function QuotePage({
                           </p>
                         </div>
                       </div>
-                      <div>
-                        <p
-                          className="text-[0.7rem] font-medium uppercase leading-tight tracking-wide text-slate-500"
-                          style={{ color: mainColor }}
-                        >
-                          לכבוד
-                        </p>
-                        <p className="mt-0.5 text-sm leading-snug text-slate-800">
-                          {meaningfulLine(quote.honorific_line) ||
-                            meaningfulLine(quote.agent_desc) ||
-                            "—"}
-                        </p>
-                      </div>
+                      {(() => {
+                        const honorific =
+                          meaningfulLine(quote.honorific_line) ||
+                          meaningfulLine(quote.agent_desc);
+                        if (!honorific) return null;
+                        return (
+                          <div>
+                            <p
+                              className="text-[0.7rem] font-medium uppercase leading-tight tracking-wide text-slate-500"
+                              style={{ color: mainColor }}
+                            >
+                              לכבוד
+                            </p>
+                            <p className="mt-0.5 text-sm leading-snug text-slate-800">
+                              {honorific}
+                            </p>
+                          </div>
+                        );
+                      })()}
                       <div>
                         <p
                           className="text-[0.7rem] font-medium uppercase leading-tight tracking-wide text-slate-500"
