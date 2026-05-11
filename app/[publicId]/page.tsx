@@ -170,7 +170,7 @@ export default async function QuotePage({
                 >
                   <div className="flex flex-col gap-4 md:flex-row md:items-stretch md:gap-0">
                     <div className="order-2 flex min-w-0 gap-3 border-t border-slate-100 pt-4 md:order-1 md:w-[min(100%,272px)] md:shrink-0 md:border-t-0 md:pt-0">
-                      <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-slate-200/80 bg-slate-50">
+                      <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg">
                         <RepresentativeAvatar
                           src={representative.rep_avatar}
                           fallback={REP_AVATAR_FALLBACK}
