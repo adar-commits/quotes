@@ -120,7 +120,7 @@ export default function ApprovalStatusSelect({
   );
 
   return (
-    <div className="flex flex-col gap-1 w-full max-w-[100px]" ref={ref}>
+    <div className="flex flex-col gap-1 w-full max-w-[100px] print:hidden" ref={ref}>
       <span
         className="text-[0.65rem] font-bold uppercase tracking-widest text-slate-500"
         style={{ color: brandColor }}

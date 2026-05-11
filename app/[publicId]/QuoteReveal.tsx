@@ -26,7 +26,7 @@ export default function QuoteReveal({ children }: { children: React.ReactNode })
     <div className={`relative min-h-screen ${noto.className}`} dir="rtl">
       {/* Shimmer skeleton — visible for 2s then fades out */}
       <div
-        className={`absolute inset-0 z-10 bg-gray-50 transition-opacity duration-500 ${
+        className={`absolute inset-0 z-10 bg-gray-50 transition-opacity duration-500 print:hidden ${
           showContent ? "pointer-events-none opacity-0" : "opacity-100"
         }`}
         aria-hidden={showContent}
@@ -107,7 +107,7 @@ export default function QuoteReveal({ children }: { children: React.ReactNode })
 
       {/* Actual quote content — fades in after 2s */}
       <div
-        className={`transition-opacity duration-500 ${
+        className={`transition-opacity duration-500 print:opacity-100 ${
           showContent ? "opacity-100" : "opacity-0"
         }`}
       >

@@ -9,6 +9,7 @@ import ApprovalStatusSelect from "./ApprovalStatusSelect";
 import ContactStrip from "./ContactStrip";
 import ProductImageWithLightbox from "./ProductImageWithLightbox";
 import QuoteBanner from "./QuoteBanner";
+import PrintButton from "./PrintButton";
 
 export const dynamic = "force-dynamic";
 
@@ -148,18 +149,19 @@ export default async function QuotePage({
     <QuoteReveal>
       {/* Carpet-style background + frosted glass container */}
       <div className="min-h-screen antialiased" dir="rtl">
+        <PrintButton mainColor={template?.main_color} />
         {/* Carpet-oriented background with slight blur layer */}
         <div
-          className="fixed inset-0 -z-10 bg-cover bg-center bg-no-repeat"
+          className="fixed inset-0 -z-10 bg-cover bg-center bg-no-repeat print:hidden"
           style={{
             backgroundImage: template?.background_url
               ? `url(${template.background_url})`
               : "url(https://images.unsplash.com/photo-1600166898405-da9535204843?w=1920)",
           }}
         />
-        <div className="fixed inset-0 -z-10 bg-gradient-to-br from-amber-100/85 via-rose-50/80 to-stone-200/85 backdrop-blur-[2px]" aria-hidden />
-        <div className="mx-auto max-w-5xl p-4 py-6 md:p-8 md:py-8">
-          <div className="overflow-hidden rounded-3xl border border-white/40 bg-white/90 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] ring-1 ring-black/5 backdrop-blur-xl">
+        <div className="fixed inset-0 -z-10 bg-gradient-to-br from-amber-100/85 via-rose-50/80 to-stone-200/85 backdrop-blur-[2px] print:hidden" aria-hidden />
+        <div className="mx-auto max-w-5xl p-4 py-6 md:p-8 md:py-8 print:max-w-none print:p-0">
+          <div className="overflow-hidden rounded-3xl border border-white/40 bg-white/90 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] ring-1 ring-black/5 backdrop-blur-xl print:rounded-none print:border-0 print:bg-white print:shadow-none print:ring-0 print:backdrop-blur-none">
             {/* Page 1: Chart only — banner + customer/salesperson (right) + quote details + financial summary */}
             <div className="border-b border-slate-200/60">
               <QuoteBanner bannerUrl={template?.banner_url} />
@@ -168,8 +170,8 @@ export default async function QuotePage({
                   className="rounded-xl border border-slate-200/60 bg-white/90 p-4 shadow-sm ring-1 ring-slate-900/5 sm:p-5"
                   dir="rtl"
                 >
-                  <div className="flex flex-col gap-4 md:flex-row md:items-stretch md:gap-0">
-                    <div className="order-2 flex min-w-0 gap-3 border-t border-slate-100 pt-4 md:order-1 md:w-[min(100%,272px)] md:shrink-0 md:border-t-0 md:pt-0">
+                  <div className="flex flex-col gap-4 md:flex-row md:items-stretch md:gap-0 print:flex-row print:items-stretch print:gap-0">
+                    <div className="order-2 flex min-w-0 gap-3 border-t border-slate-100 pt-4 md:order-1 md:w-[min(100%,272px)] md:shrink-0 md:border-t-0 md:pt-0 print:order-1 print:w-[260px] print:shrink-0 print:border-t-0 print:pt-0">
                       <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg">
                         <RepresentativeAvatar
                           src={representative.rep_avatar}
@@ -207,11 +209,11 @@ export default async function QuotePage({
                     </div>
 
                     <div
-                      className="hidden w-px shrink-0 self-stretch bg-slate-200/90 md:order-2 md:mx-4 md:block"
+                      className="hidden w-px shrink-0 self-stretch bg-slate-200/90 md:order-2 md:mx-4 md:block print:order-2 print:mx-4 print:block"
                       aria-hidden
                     />
 
-                    <div className="order-1 min-w-0 space-y-2.5 text-right md:order-3 md:flex-1">
+                    <div className="order-1 min-w-0 space-y-2.5 text-right md:order-3 md:flex-1 print:order-3 print:flex-1">
                       <div className="grid grid-cols-2 gap-x-4 gap-y-2">
                         <div>
                           <p
@@ -339,7 +341,7 @@ export default async function QuotePage({
                   </h2>
                 </div>
                 {/* Product rows: image visible + attributes next to it (reference layout) */}
-                <ul className="space-y-8">
+                <ul className="space-y-8 print:space-y-4">
                   {products.map((p, i) => {
                     const lineTotal =
                       p.qty * (Number(p.unit_price) - Number(p.unit_discount));
@@ -347,9 +349,9 @@ export default async function QuotePage({
                     return (
                       <li
                         key={i}
-                        className="quote-card-hover flex flex-col gap-4 rounded-2xl border border-slate-200/80 bg-white/90 p-4 shadow-md ring-1 ring-slate-900/5 backdrop-blur-sm md:flex-row md:items-start md:gap-6 md:p-6"
+                        className="quote-card-hover flex flex-col gap-4 rounded-2xl border border-slate-200/80 bg-white/90 p-4 shadow-md ring-1 ring-slate-900/5 backdrop-blur-sm md:flex-row md:items-start md:gap-6 md:p-6 print:flex-row print:items-start print:gap-6 print:rounded-xl print:border print:border-slate-200 print:bg-white print:p-4 print:shadow-none print:ring-0 print:backdrop-blur-none print:break-inside-avoid"
                       >
-                        <div className="hidden w-full shrink-0 md:block md:w-[20.24rem] md:max-w-[34.5%]">
+                        <div className="hidden w-full shrink-0 md:block md:w-[20.24rem] md:max-w-[34.5%] print:block print:w-[18rem] print:max-w-[40%]">
                           <ProductImageWithLightbox
                             src={p.picture_url}
                             fill
@@ -358,8 +360,8 @@ export default async function QuotePage({
                             sizes="(max-width: 768px) 100vw, 414px"
                           />
                         </div>
-                        <div className="flex min-w-0 flex-1 flex-col gap-4 text-right md:max-w-[55%]">
-                          <div className="flex justify-end md:hidden">
+                        <div className="flex min-w-0 flex-1 flex-col gap-4 text-right md:max-w-[55%] print:max-w-[60%]">
+                          <div className="flex justify-end md:hidden print:hidden">
                             <ApprovalStatusSelect
                               quotePublicId={publicId}
                               productSortOrder={p.sort_order}
@@ -385,7 +387,7 @@ export default async function QuotePage({
                                 {formatCurrency(lineTotal)}
                               </span>
                             </div>
-                            <div className="hidden shrink-0 md:block">
+                            <div className="hidden shrink-0 md:block print:hidden">
                               <ApprovalStatusSelect
                                 quotePublicId={publicId}
                                 productSortOrder={p.sort_order}
@@ -394,7 +396,7 @@ export default async function QuotePage({
                               />
                             </div>
                           </div>
-                          <div className="w-full md:hidden">
+                          <div className="w-full md:hidden print:hidden">
                             <ProductImageWithLightbox
                               src={p.picture_url}
                               fill
@@ -466,7 +468,7 @@ export default async function QuotePage({
 
             {/* Signature footer at end of product pages */}
             {quote.require_signature && (
-              <div className="border-t border-slate-100 bg-slate-50/30 p-4 sm:p-6 md:p-8">
+              <div className="border-t border-slate-100 bg-slate-50/30 p-4 sm:p-6 md:p-8 print:hidden">
                 <QuoteSignature quotePublicId={publicId} />
               </div>
             )}

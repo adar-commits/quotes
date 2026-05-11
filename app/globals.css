@@ -77,3 +77,65 @@ body {
 .animate-fade-up {
   animation: fadeUp 0.4s ease-out forwards;
 }
+
+/* ============================================================
+   Print / Save-as-PDF styling for the public quote page.
+   Goal: clean A4 PDF without carpet bg, frosted glass, stacked
+   mobile layout, or interactive controls.
+   ============================================================ */
+@media print {
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+
+  /* Force exact colors so red headers / gradients survive print. */
+  *,
+  *::before,
+  *::after {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  html,
+  body {
+    background: #ffffff !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Drop transitions so animated reveal/hover doesn't half-render. */
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  /* Anything inside the quote shouldn't blur. */
+  [class*="backdrop-blur"],
+  [style*="backdrop-filter"] {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  /* Help product cards and section blocks not split awkwardly. */
+  .quote-card-hover,
+  table,
+  thead,
+  tbody,
+  tr {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  /* Sort buttons in table header: keep label, drop hover/underline. */
+  thead th button {
+    text-decoration: none !important;
+    cursor: default !important;
+  }
+}
+

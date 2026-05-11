@@ -10,7 +10,7 @@ export default function QuoteBanner({ bannerUrl }: { bannerUrl?: string | null }
   const src = bannerUrl || DEFAULT_BANNER;
 
   return (
-    <div className="relative h-32 w-full overflow-hidden sm:h-40 md:h-52">
+    <div className="relative h-32 w-full overflow-hidden sm:h-40 md:h-52 print:h-24">
       <div
         className="absolute inset-0 bg-gradient-to-br from-amber-100/95 via-rose-50/90 to-stone-200/95"
         aria-hidden

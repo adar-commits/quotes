@@ -203,14 +203,14 @@ export default function QuoteSignature({ quotePublicId }: Props) {
 
   if (signed) {
     return (
-      <section className="rounded-2xl border border-slate-200/80 bg-white/90 p-4 shadow-lg ring-1 ring-slate-900/5 backdrop-blur-sm sm:p-6 md:p-8">
+      <section className="rounded-2xl border border-slate-200/80 bg-white/90 p-4 shadow-lg ring-1 ring-slate-900/5 backdrop-blur-sm sm:p-6 md:p-8 print:hidden">
         <p className="text-center text-lg font-bold text-[#801a1e]">ההצעה נחתמה בהצלחה • Status: Signed</p>
       </section>
     );
   }
 
   return (
-    <section className="rounded-2xl border border-slate-200/80 bg-white/90 p-4 shadow-lg ring-1 ring-slate-900/5 backdrop-blur-sm sm:p-6 md:p-8">
+    <section className="rounded-2xl border border-slate-200/80 bg-white/90 p-4 shadow-lg ring-1 ring-slate-900/5 backdrop-blur-sm sm:p-6 md:p-8 print:hidden">
       <h3 className="mb-4 text-center text-lg font-bold text-[#801a1e] sm:mb-6 sm:text-xl md:text-2xl">
         חתימה דיגיטלית על הצעת המחיר
       </h3>

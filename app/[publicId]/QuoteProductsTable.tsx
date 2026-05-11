@@ -99,10 +99,10 @@ export default function QuoteProductsTable({
   return (
     <>
       <div
-        className="-mx-1 overflow-x-auto overscroll-x-contain border-t border-slate-200/80 px-1 pb-1 [-webkit-overflow-scrolling:touch]"
+        className="-mx-1 overflow-x-auto overscroll-x-contain border-t border-slate-200/80 px-1 pb-1 [-webkit-overflow-scrolling:touch] print:overflow-visible print:mx-0 print:px-0"
         dir="rtl"
       >
-        <table className="w-max min-w-[920px] border-collapse md:w-full md:min-w-0 md:table-fixed">
+        <table className="w-max min-w-[920px] border-collapse md:w-full md:min-w-0 md:table-fixed print:w-full print:min-w-0 print:table-fixed">
           <colgroup>
             <col style={{ width: "15.6%" }} />
             <col />
@@ -189,10 +189,10 @@ export default function QuoteProductsTable({
                 key={`${p.sort_order}-${i}`}
                 className={`border-b border-slate-100 ${i % 2 === 1 ? "bg-slate-50/80" : ""}`}
               >
-                <td className="max-w-[min(28vw,11rem)] px-2 py-3 text-right text-sm text-slate-700 align-top md:max-w-none md:px-3">
+                <td className="max-w-[min(28vw,11rem)] px-2 py-3 text-right text-sm text-slate-700 align-top md:max-w-none md:px-3 print:max-w-none print:px-3">
                   <span className="break-all">{p.sku ?? "—"}</span>
                 </td>
-                <td className="min-w-[12rem] max-w-[42vw] px-2 py-3 text-right text-sm text-slate-700 align-top md:max-w-none md:px-3">
+                <td className="min-w-[12rem] max-w-[42vw] px-2 py-3 text-right text-sm text-slate-700 align-top md:max-w-none md:px-3 print:min-w-0 print:max-w-none print:px-3">
                   <span className="break-words">{p.product_desc ?? "—"}</span>
                 </td>
                 <td className="whitespace-nowrap px-2 py-3 text-right text-sm text-slate-700 align-top tabular-nums md:px-3">
@@ -216,7 +216,7 @@ export default function QuoteProductsTable({
         </table>
       </div>
       <div
-        className="relative flex flex-col items-center justify-center gap-0 px-4 py-5 text-white md:flex-row md:flex-wrap md:items-start md:justify-between md:gap-4 md:px-8"
+        className="relative flex flex-col items-center justify-center gap-0 px-4 py-5 text-white md:flex-row md:flex-wrap md:items-start md:justify-between md:gap-4 md:px-8 print:flex-row print:flex-wrap print:items-start print:justify-between print:gap-4 print:px-6 print:py-4"
         style={{
           background: `linear-gradient(135deg, ${mainColor} 0%, ${mainColor}dd 100%)`,
           boxShadow:
@@ -225,8 +225,8 @@ export default function QuoteProductsTable({
         dir="rtl"
       >
         {/* Mobile: center stack; סה״כ לתשלום last. Desktop: row remains readable */}
-        <div className="flex w-full max-w-md flex-col items-center gap-3 text-center md:max-w-none md:flex-row md:flex-wrap md:items-start md:justify-between md:gap-8 md:text-right">
-          <div className="md:text-right">
+        <div className="flex w-full max-w-md flex-col items-center gap-3 text-center md:max-w-none md:flex-row md:flex-wrap md:items-start md:justify-between md:gap-8 md:text-right print:max-w-none print:flex-row print:flex-wrap print:items-start print:justify-between print:gap-6 print:text-right">
+          <div className="md:text-right print:text-right">
             <p className="text-xs font-medium opacity-90 sm:text-sm">
               סה&quot;כ ללא מע&quot;מ
             </p>
@@ -235,7 +235,7 @@ export default function QuoteProductsTable({
             </p>
           </div>
           {showSpecial && (
-            <div className="md:text-right">
+            <div className="md:text-right print:text-right">
               <p className="text-xs font-medium opacity-90 sm:text-sm">
                 הנחה מיוחדת ({specialDiscountPercent}%)
               </p>
@@ -244,7 +244,7 @@ export default function QuoteProductsTable({
               </p>
             </div>
           )}
-          <div className="md:text-right">
+          <div className="md:text-right print:text-right">
             <p className="text-xs font-medium opacity-90 sm:text-sm">
               מע&quot;מ ({quoteVat}%)
             </p>
@@ -252,7 +252,7 @@ export default function QuoteProductsTable({
               {formatCurrency(vatAmount)}
             </p>
           </div>
-          <div className="mt-1 w-full border-t border-white/25 pt-3 md:mt-0 md:w-auto md:border-t-0 md:pt-0">
+          <div className="mt-1 w-full border-t border-white/25 pt-3 md:mt-0 md:w-auto md:border-t-0 md:pt-0 print:mt-0 print:w-auto print:border-t-0 print:pt-0">
             <p className="text-xs font-medium opacity-90 sm:text-sm">
               סה&quot;כ לתשלום
             </p>
