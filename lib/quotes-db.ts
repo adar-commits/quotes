@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { unstable_noStore as noStore } from "next/cache";
+import type { ClientSignaturePayload } from "@/lib/client-signature";
 import {
   mergeRepresentativeRowWithSnapshot,
   normalizeRepresentativeSnapshot,
@@ -36,6 +37,8 @@ export type QuoteRow = {
   agent_desc: string | null;
   honorific_line?: string | null;
   status?: string | null;
+  signed_at?: string | null;
+  signature_payload?: ClientSignaturePayload | null;
   template_id: string | null;
   /** Last normalized representative payload from POST /api/quotes (merged with quote_representatives on read). */
   representative_snapshot?: unknown;

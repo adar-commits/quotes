@@ -1,10 +1,22 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import type { ClientSignaturePayload } from "@/lib/client-signature";
 
-type Props = { quotePublicId: string };
+type Props = {
+  quotePublicId: string;
+  /** From server: quote status is signed — form hidden, saved data shown */
+  readOnlySigned?: boolean;
+  savedSignature?: ClientSignaturePayload | null;
+};
 
-export default function QuoteSignature({ quotePublicId }: Props) {
+export default function QuoteSignature({
+  quotePublicId,
+  readOnlySigned = false,
+  savedSignature = null,
+}: Props) {
+  const router = useRouter();
   const [name, setName] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [companyReg, setCompanyReg] = useState("");
@@ -184,22 +196,79 @@ export default function QuoteSignature({ quotePublicId }: Props) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          signerName: name,
-          companyName,
-          companyReg,
+          signerName: name.trim(),
+          companyName: companyName.trim(),
+          companyReg: companyReg.trim(),
+          signatureImage: canvasRef.current?.toDataURL("image/png"),
         }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error ?? "שגיאה בשמירה");
+        if (res.status === 409) {
+          throw new Error("ההצעה כבר נחתמה");
+        }
+        throw new Error(
+          typeof data.error === "string" ? data.error : "שגיאה בשמירה"
+        );
       }
       setSigned(true);
+      router.refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : "שגיאה בשמירה");
     } finally {
       setSubmitting(false);
     }
   };
+
+  if (readOnlySigned) {
+    const s = savedSignature;
+    return (
+      <section className="rounded-2xl border border-slate-200/80 bg-white/90 p-4 shadow-lg ring-1 ring-slate-900/5 backdrop-blur-sm sm:p-6 md:p-8 print:hidden">
+        <p className="mb-6 text-center text-lg font-bold text-[#801a1e]">
+          ההצעה נחתמה • Status: Signed
+        </p>
+        <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
+          <div className="space-y-3 text-right text-slate-800">
+            <div>
+              <span className="text-sm font-semibold text-slate-500">שם החותמ/ת</span>
+              <p className="mt-1 rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-2">
+                {s?.signerName?.trim() || "—"}
+              </p>
+            </div>
+            <div>
+              <span className="text-sm font-semibold text-slate-500">שם החברה</span>
+              <p className="mt-1 rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-2">
+                {s?.companyName?.trim() || "—"}
+              </p>
+            </div>
+            <div>
+              <span className="text-sm font-semibold text-slate-500">ח.פ</span>
+              <p className="mt-1 rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-2">
+                {s?.companyReg?.trim() || "—"}
+              </p>
+            </div>
+          </div>
+          <div>
+            <span className="mb-2 block text-right text-sm font-semibold text-slate-500">
+              חתימה
+            </span>
+            {s?.imagePngDataUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element -- data URL from DB
+              <img
+                src={s.imagePngDataUrl}
+                alt="חתימה שמורה"
+                className="max-h-48 w-full rounded-xl border-2 border-slate-200 bg-white object-contain object-center p-2"
+              />
+            ) : (
+              <p className="rounded-xl border border-dashed border-slate-300 bg-slate-50/80 p-6 text-center text-sm text-slate-500">
+                אין תמונת חתימה שמורה להצגה
+              </p>
+            )}
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   if (signed) {
     return (

@@ -18,6 +18,8 @@ type Props = {
   productSortOrder: number;
   initialStatus?: string | null;
   mainColor?: string | null;
+  /** When true (quote signed), show status only — no edits */
+  locked?: boolean;
 };
 
 export default function ApprovalStatusSelect({
@@ -25,6 +27,7 @@ export default function ApprovalStatusSelect({
   productSortOrder,
   initialStatus = null,
   mainColor,
+  locked = false,
 }: Props) {
   const brandColor = mainColor || DEFAULT_MAIN;
   const [selected, setSelected] = useState<StatusValue | null>(
@@ -61,6 +64,7 @@ export default function ApprovalStatusSelect({
   }, [open]);
 
   const handleSelect = async (value: StatusValue) => {
+    if (locked) return;
     setSelected(value);
     setOpen(false);
     if (value !== "approved") return;
@@ -88,7 +92,12 @@ export default function ApprovalStatusSelect({
     ? OPTIONS.find((o) => o.value === selected)?.label ?? "סטטוס"
     : "סטטוס";
 
-  const dropdownList = open && dropdownRect && typeof document !== "undefined" && createPortal(
+  const dropdownList =
+    !locked &&
+    open &&
+    dropdownRect &&
+    typeof document !== "undefined" &&
+    createPortal(
     <ul
       ref={(el) => { dropdownRef.current = el; }}
       className="fixed z-[9999] rounded-lg border border-slate-200 bg-white py-1 shadow-xl"
@@ -131,8 +140,8 @@ export default function ApprovalStatusSelect({
         <button
           ref={btnRef}
           type="button"
-          onClick={() => setOpen(!open)}
-          disabled={saving}
+          onClick={() => !locked && setOpen(!open)}
+          disabled={saving || locked}
           className="flex w-full max-w-[100px] items-center justify-between gap-1 rounded-lg border border-slate-200 bg-slate-50 px-2 py-1.5 text-right text-xs font-medium text-slate-800 transition-all hover:border-slate-300 disabled:opacity-70"
     style={{
         borderColor: selected ? brandColor : undefined,

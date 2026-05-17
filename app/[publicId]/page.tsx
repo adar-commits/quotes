@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { calculateQuoteBreakdown } from "@/lib/quote-total";
+import { parseClientSignaturePayload } from "@/lib/client-signature";
 import { getQuoteByPublicId } from "@/lib/quotes-db";
 import QuoteProductsTable from "./QuoteProductsTable";
 import QuoteSignature from "./QuoteSignature";
@@ -134,6 +135,10 @@ export default async function QuotePage({
   const { quote, customer, representative, products, paymentTerms, template } = data;
   const mainColor = template?.main_color ?? DEFAULT_MAIN;
   const bulletsColor = template?.bullets_color ?? mainColor;
+  const isSigned = quote.status === "signed";
+  const savedClientSignature = parseClientSignaturePayload(
+    quote.signature_payload
+  );
 
   const breakdown = calculateQuoteBreakdown({
     vat: Number(quote.vat),
@@ -367,6 +372,7 @@ export default async function QuotePage({
                               productSortOrder={p.sort_order}
                               initialStatus={p.approval_status}
                               mainColor={template?.main_color}
+                              locked={isSigned}
                             />
                           </div>
                           <div
@@ -393,6 +399,7 @@ export default async function QuotePage({
                                 productSortOrder={p.sort_order}
                                 initialStatus={p.approval_status}
                                 mainColor={template?.main_color}
+                                locked={isSigned}
                               />
                             </div>
                           </div>
@@ -469,7 +476,11 @@ export default async function QuotePage({
             {/* Signature footer at end of product pages */}
             {quote.require_signature && (
               <div className="border-t border-slate-100 bg-slate-50/30 p-4 sm:p-6 md:p-8 print:hidden">
-                <QuoteSignature quotePublicId={publicId} />
+                <QuoteSignature
+                  quotePublicId={publicId}
+                  readOnlySigned={isSigned}
+                  savedSignature={savedClientSignature}
+                />
               </div>
             )}
           </div>

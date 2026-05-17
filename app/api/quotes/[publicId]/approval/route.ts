@@ -34,12 +34,19 @@ export async function PATCH(
   const supabase = createServiceRoleClient();
   const { data: quote, error: quoteError } = await supabase
     .from("quotes")
-    .select("id")
+    .select("id, status")
     .eq("public_id", publicId)
     .single();
 
   if (quoteError || !quote) {
     return NextResponse.json({ error: "Quote not found" }, { status: 404 });
+  }
+
+  if ((quote as { status?: string | null }).status === "signed") {
+    return NextResponse.json(
+      { error: "Quote is signed; approval cannot be changed" },
+      { status: 403 }
+    );
   }
 
   const { error: updateError } = await supabase
