@@ -6,7 +6,7 @@ import {
 } from "@/lib/quotation-representative-extract";
 
 const WEBHOOK_URL =
-  "https://redcarpet.app.n8n.cloud/webhook-test/dbb8db92-f1f1-4f8a-8f02-6d88d3865df2";
+  "https://hook.eu2.make.com/4i0gxbxw40zefjsvvdhdl15tb0cm33me";
 
 export async function POST(
   request: NextRequest,
@@ -93,6 +93,7 @@ export async function POST(
     .eq("id", quote.id);
 
   const payload = {
+    isSigned: true,
     status: "Signed",
     quote: { ...quote, status: "signed" },
     customer,
