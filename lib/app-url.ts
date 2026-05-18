@@ -28,3 +28,12 @@ export function resolvePublicAppOrigin(fallbackOrigin: string): string {
   if (fromEnv) return new URL(fromEnv).origin;
   return fallbackOrigin;
 }
+
+/** Canonical origin for `metadataBase` (Open Graph / Twitter absolute URLs). */
+export function resolveMetadataBaseUrl(): URL {
+  const fromEnv =
+    normalizeBaseUrl(process.env.APP_URL) ??
+    normalizeBaseUrl(process.env.NEXT_PUBLIC_APP_URL);
+  if (fromEnv) return new URL(fromEnv);
+  return new URL("https://quotes.carpetshop.co.il");
+}

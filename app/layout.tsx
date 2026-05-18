@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { resolveMetadataBaseUrl } from "@/lib/app-url";
 import LineLoader from "./LineLoader";
 import "./globals.css";
 
@@ -14,8 +15,19 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Quotes",
-  description: "Quotes app",
+  metadataBase: resolveMetadataBaseUrl(),
+  title: { default: "הצעות מחיר", template: "%s" },
+  description: "צפייה, אישור והערכה של הצעות מחיר",
+  icons: {
+    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+  },
+  openGraph: {
+    type: "website",
+    locale: "he_IL",
+    siteName: "הצעות מחיר",
+    title: "הצעות מחיר",
+    description: "צפייה, אישור והערכה של הצעות מחיר",
+  },
 };
 
 const THEME_RED = "#801a1e";
@@ -34,7 +46,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="he">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { calculateQuoteBreakdown } from "@/lib/quote-total";
@@ -16,6 +17,9 @@ import QuoteClientViewTracker from "./QuoteClientViewTracker";
 export const dynamic = "force-dynamic";
 
 const DEFAULT_MAIN = "#801a1e";
+
+const OG_IMAGE_FALLBACK =
+  "https://quotes.carpetshop.co.il/img/invoice_header.jpg";
 
 const REP_AVATAR_FALLBACK =
   "https://cdn.shopify.com/s/files/1/0594/9839/7887/files/iScreen_Shoter_-_Google_Chrome_-_260429144738-removebg-preview.png?v=1777463340";
@@ -113,14 +117,100 @@ export async function generateMetadata({
   params,
 }: {
   params: Promise<{ publicId: string }>;
-}) {
+}): Promise<Metadata> {
   const { publicId } = await params;
   const data = await getQuoteByPublicId(publicId);
-  if (!data?.template) return {};
-  const t = data.template;
+
+  if (!data) {
+    return {
+      title: { absolute: "הצעה לא נמצאה" },
+      description: "הקישור אינו תקף או שההצעה הוסרה.",
+      robots: { index: false, follow: false },
+    };
+  }
+
+  const { quote, customer, products, template } = data;
+  const mainColor = template?.main_color ?? DEFAULT_MAIN;
+
+  const meaningfulLineMeta = (s: string | null | undefined): string | null => {
+    const t = typeof s === "string" ? s.trim() : "";
+    if (!t) return null;
+    if (/^[,;:.!?\-–—\s]+$/u.test(t)) return null;
+    return t;
+  };
+
+  const customerDisplay =
+    meaningfulLineMeta(customer?.customer_name) ||
+    customer?.customer_id?.trim() ||
+    "לקוח";
+
+  const quoteRef =
+    (quote.public_id ? quote.public_id.slice(-10) : null) ||
+    quote.quotation_id ||
+    quote.invoice_id ||
+    publicId;
+
+  const dateStr = quote.invoice_creation_date
+    ? new Date(quote.invoice_creation_date).toLocaleDateString("he-IL", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      })
+    : null;
+
+  const breakdown = calculateQuoteBreakdown({
+    vat: Number(quote.vat),
+    specialDiscount: Number(quote.special_discount),
+    lines: products.map((p) => ({
+      qty: p.qty,
+      unitPrice: Number(p.unit_price),
+      unitDiscount: Number(p.unit_discount),
+    })),
+  });
+
+  const formattedTotal = new Intl.NumberFormat("he-IL", {
+    style: "currency",
+    currency: "ILS",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(breakdown.total);
+
+  const projectLabel = quote.project_name?.trim() || "לא צוין";
+  const titleAbsolute = `הצעת מחיר · ${customerDisplay} · מס׳ ${quoteRef}`;
+
+  const descriptionParts = [
+    `פרויקט: ${projectLabel}.`,
+    dateStr ? `תאריך הפקה: ${dateStr}.` : null,
+    `סה״כ כולל מע״מ: ${formattedTotal}.`,
+    products.length > 0 ? `${products.length} פריטים בהצעה.` : null,
+  ].filter(Boolean) as string[];
+  const description = descriptionParts.join(" ");
+
+  const ogImageUrl =
+    template?.banner_url?.trim() ||
+    customer?.customer_logo?.trim() ||
+    OG_IMAGE_FALLBACK;
+
   return {
-    themeColor: t.main_color,
-    icons: t.favicon_url ? { icon: t.favicon_url } : undefined,
+    title: { absolute: titleAbsolute },
+    description,
+    alternates: { canonical: `/${publicId}` },
+    openGraph: {
+      type: "website",
+      locale: "he_IL",
+      siteName: "הצעות מחיר",
+      title: titleAbsolute,
+      description,
+      url: `/${publicId}`,
+      images: [{ url: ogImageUrl, alt: titleAbsolute }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: titleAbsolute,
+      description,
+      images: [ogImageUrl],
+    },
+    themeColor: mainColor,
   };
 }
 
