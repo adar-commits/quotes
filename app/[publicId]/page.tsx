@@ -11,6 +11,7 @@ import ContactStrip from "./ContactStrip";
 import ProductImageWithLightbox from "./ProductImageWithLightbox";
 import QuoteBanner from "./QuoteBanner";
 import PrintButton from "./PrintButton";
+import QuoteClientViewTracker from "./QuoteClientViewTracker";
 
 export const dynamic = "force-dynamic";
 
@@ -125,10 +126,14 @@ export async function generateMetadata({
 
 export default async function QuotePage({
   params,
+  searchParams,
 }: {
   params: Promise<{ publicId: string }>;
+  searchParams: Promise<{ viewer?: string }>;
 }) {
   const { publicId } = await params;
+  const { viewer } = await searchParams;
+  const clientViewerTracked = viewer === "client";
   const data = await getQuoteByPublicId(publicId);
   if (!data) notFound();
 
@@ -152,6 +157,10 @@ export default async function QuotePage({
 
   return (
     <QuoteReveal>
+      <QuoteClientViewTracker
+        quotePublicId={publicId}
+        enabled={clientViewerTracked}
+      />
       {/* Carpet-style background + frosted glass container */}
       <div className="min-h-screen antialiased" dir="rtl">
         <PrintButton mainColor={template?.main_color} />

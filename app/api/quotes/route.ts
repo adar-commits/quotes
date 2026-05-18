@@ -21,6 +21,7 @@ import {
   vatNumber,
 } from "@/lib/quotation-payload-aliases";
 import { resolvePublicAppBase } from "@/lib/app-url";
+import { buildQuoteClientTrackedUrl, buildQuotePublicUrl } from "@/lib/quote-public-urls";
 import { normalizeQuoteRequestRoot } from "@/lib/quotation-request-root";
 
 /** Some clients send `[[{...}]]`; peel single-element array wrappers until we hit an object. */
@@ -289,7 +290,8 @@ export async function POST(request: NextRequest) {
   }
 
   const baseUrl = resolvePublicAppBase(request);
-  const url = `${baseUrl}/${publicId}`;
+  const url = buildQuotePublicUrl(baseUrl, publicId);
+  const client_url = buildQuoteClientTrackedUrl(baseUrl, publicId);
 
   const productLines = products.map((p) => ({
     qty: p.Qty ?? 0,
@@ -307,6 +309,7 @@ export async function POST(request: NextRequest) {
     quote_id: quoteId,
     template_id: templateId ?? undefined,
     url,
+    client_url,
     total,
   });
 }

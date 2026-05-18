@@ -33,6 +33,8 @@ export type QuoteRow = {
   special_discount: number;
   require_signature: boolean;
   payable?: boolean;
+  /** Opens of `?viewer=client` URL; see increment_quote_client_view_count. */
+  client_view_count?: number;
   invoice_creation_date: string | null;
   agent_code: string | null;
   agent_desc: string | null;
