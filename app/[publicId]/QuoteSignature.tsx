@@ -9,13 +9,82 @@ type Props = {
   /** From server: quote status is signed — form hidden, saved data shown */
   readOnlySigned?: boolean;
   savedSignature?: ClientSignaturePayload | null;
+  /** From POST /api/quotes: allow credit-card payment link after signing */
+  payable?: boolean;
 };
 
 export default function QuoteSignature({
   quotePublicId,
   readOnlySigned = false,
   savedSignature = null,
+  payable = false,
 }: Props) {
+  const [paymentLinkLoading, setPaymentLinkLoading] = useState(false);
+  const [paymentLinkError, setPaymentLinkError] = useState<string | null>(null);
+
+  const handlePaymentLink = useCallback(async () => {
+    setPaymentLinkError(null);
+    setPaymentLinkLoading(true);
+    try {
+      const res = await fetch(`/api/quotes/${quotePublicId}/payment-link`, {
+        method: "POST",
+      });
+      const data = (await res.json().catch(() => ({}))) as {
+        error?: string;
+        paymentLinkUrl?: string;
+      };
+      if (!res.ok) {
+        throw new Error(
+          typeof data.error === "string" ? data.error : "שגיאה ביצירת קישור התשלום"
+        );
+      }
+      const url = data.paymentLinkUrl;
+      if (typeof url !== "string" || !url.trim()) {
+        throw new Error("קישור התשלום חסר בתשובת השרת");
+      }
+      window.location.assign(url.trim());
+    } catch (e) {
+      setPaymentLinkError(
+        e instanceof Error ? e.message : "שגיאה ביצירת קישור התשלום"
+      );
+    } finally {
+      setPaymentLinkLoading(false);
+    }
+  }, [quotePublicId]);
+
+  const paymentSection =
+    payable ? (
+      <div className="mt-6 space-y-3 border-t border-slate-200 pt-6">
+        <button
+          type="button"
+          onClick={handlePaymentLink}
+          disabled={paymentLinkLoading}
+          className="flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl bg-[#801a1e] px-6 py-4 text-base font-semibold text-white shadow-lg transition-all hover:bg-[#6b1619] hover:shadow-xl active:scale-[0.99] disabled:opacity-70"
+          style={{
+            boxShadow: "0 4px 14px rgba(128, 26, 30, 0.35)",
+            WebkitTapHighlightColor: "transparent",
+          }}
+        >
+          {paymentLinkLoading ? (
+            <>
+              <span
+                className="h-5 w-5 shrink-0 animate-spin rounded-full border-2 border-white/30 border-t-white"
+                aria-hidden
+              />
+              <span>מכין קישור…</span>
+            </>
+          ) : (
+            "צור לינק לתשלום באשראי"
+          )}
+        </button>
+        {paymentLinkError ? (
+          <p className="text-center text-sm text-red-600" role="alert">
+            {paymentLinkError}
+          </p>
+        ) : null}
+      </div>
+    ) : null;
+
   const router = useRouter();
   const [name, setName] = useState("");
   const [companyName, setCompanyName] = useState("");
@@ -266,6 +335,7 @@ export default function QuoteSignature({
             )}
           </div>
         </div>
+        {paymentSection}
       </section>
     );
   }
@@ -274,6 +344,7 @@ export default function QuoteSignature({
     return (
       <section className="rounded-2xl border border-slate-200/80 bg-white/90 p-4 shadow-lg ring-1 ring-slate-900/5 backdrop-blur-sm sm:p-6 md:p-8 print:hidden">
         <p className="text-center text-lg font-bold text-[#801a1e]">ההצעה נחתמה בהצלחה • Status: Signed</p>
+        {paymentSection}
       </section>
     );
   }

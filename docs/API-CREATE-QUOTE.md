@@ -53,6 +53,7 @@ Send a **single quote object** or an **array with one quote object**. Fields map
     },
     "specialDiscount": 0,
     "requireSignature": true,
+    "payable": false,
     "invoiceCreationDate": "2026-02-25 17:41",
     "agentCode": null,
     "agentDesc": null
@@ -99,6 +100,7 @@ curl -X POST "https://csquotes.vercel.app/api/quotes" \
     },
     "specialDiscount": 0,
     "requireSignature": true,
+    "payable": false,
     "invoiceCreationDate": "2026-02-25 17:41",
     "agentCode": null,
     "agentDesc": null
@@ -131,5 +133,6 @@ curl -X POST "https://csquotes.vercel.app/api/quotes" \
 
 ## Notes
 
+- **`payable`** – optional boolean, default `false`. When `true`, after the customer signs the quote they can tap **צור לינק לתשלום באשראי** on the public page; the app asks your webhook for a URL and redirects the browser there.
 - `public_id` is auto-generated (22-char hex) and used in the public quote URL.
 - No auth header required for this endpoint; protect it in production (e.g. API key or server-only) if needed.

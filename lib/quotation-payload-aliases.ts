@@ -145,6 +145,18 @@ export function requireSignatureBool(raw: Record<string, unknown>): boolean {
   return true;
 }
 
+/** Credit-card payment link on signed quotes; default false unless explicitly true. */
+export function payableBool(raw: Record<string, unknown>): boolean {
+  const v = raw.payable ?? raw.Payable;
+  if (v === true) return true;
+  if (typeof v === "string") {
+    const t = v.trim().toLowerCase();
+    return t === "true" || t === "1";
+  }
+  if (v === 1) return true;
+  return false;
+}
+
 export function vatNumber(raw: Record<string, unknown>): number | undefined {
   const v = raw.vat ?? raw.VAT ?? raw.Vat ?? raw.value_added_tax;
   if (typeof v === "number" && !Number.isNaN(v)) return v;

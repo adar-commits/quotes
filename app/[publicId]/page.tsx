@@ -480,6 +480,7 @@ export default async function QuotePage({
                   quotePublicId={publicId}
                   readOnlySigned={isSigned}
                   savedSignature={savedClientSignature}
+                  payable={quote.payable === true}
                 />
               </div>
             )}

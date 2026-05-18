@@ -32,6 +32,7 @@ export type QuoteRow = {
   quotation_id: string | null;
   special_discount: number;
   require_signature: boolean;
+  payable?: boolean;
   invoice_creation_date: string | null;
   agent_code: string | null;
   agent_desc: string | null;

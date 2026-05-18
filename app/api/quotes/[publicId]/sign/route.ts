@@ -1,18 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { ClientSignaturePayload } from "@/lib/client-signature";
+import { loadQuoteWebhookEnrichment } from "@/lib/quote-webhook-enrichment";
+import { getQuoteWebhookUrl } from "@/lib/quote-webhook";
 import { createServiceRoleClient } from "@/lib/supabase-server";
-import {
-  mergeRepresentativeRowWithSnapshot,
-  normalizeRepresentativeSnapshot,
-} from "@/lib/quotation-representative-extract";
 
 const PNG_DATA_URL_PREFIX = "data:image/png;base64,";
 /** Reject empty / near-empty canvas uploads (~trivial PNG). */
 const MIN_SIGNATURE_BASE64_LEN = 800;
 const MAX_SIGNATURE_DATA_URL_LEN = 2_500_000;
-
-const WEBHOOK_URL =
-  "https://hook.eu2.make.com/4i0gxbxw40zefjsvvdhdl15tb0cm33me";
 
 export async function POST(
   request: NextRequest,
@@ -102,41 +97,9 @@ export async function POST(
     imagePngDataUrl: signatureImage,
   };
 
-  const [customerRes, repRes, productsRes, termsRes] = await Promise.all([
-    supabase
-      .from("quote_customers")
-      .select("customer_id, customer_name, customer_address, customer_logo")
-      .eq("quote_id", quote.id)
-      .maybeSingle(),
-    supabase
-      .from("quote_representatives")
-      .select("rep_phone, rep_email, rep_avatar, rep_full_name, rep_title")
-      .eq("quote_id", quote.id)
-      .maybeSingle(),
-    supabase
-      .from("quote_products")
-      .select("*")
-      .eq("quote_id", quote.id)
-      .order("sort_order", { ascending: true }),
-    supabase
-      .from("quote_payment_terms")
-      .select("sort_order, term")
-      .eq("quote_id", quote.id)
-      .order("sort_order", { ascending: true }),
-  ]);
-
-  const customer = customerRes.data ?? null;
-
   const qRow = quote as { representative_snapshot?: unknown };
-  const repSnapshot = normalizeRepresentativeSnapshot(
-    qRow.representative_snapshot
-  );
-  const representative = mergeRepresentativeRowWithSnapshot(
-    repRes.data,
-    repSnapshot
-  );
-  const products = productsRes.data ?? [];
-  const paymentTerms = termsRes.data ?? [];
+  const { customer, representative, products, paymentTerms } =
+    await loadQuoteWebhookEnrichment(supabase, quote.id, qRow);
 
   const signedAt = new Date().toISOString();
   const { error: signUpdateError } = await supabase
@@ -168,7 +131,7 @@ export async function POST(
   };
 
   try {
-    const webhookRes = await fetch(WEBHOOK_URL, {
+    const webhookRes = await fetch(getQuoteWebhookUrl(), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
