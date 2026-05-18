@@ -120,6 +120,7 @@ export async function POST(
   }
 
   const payload = {
+    eventType: "quoteSign" as const,
     isSigned: true,
     status: "Signed",
     quote: { ...quote, status: "signed", signed_at: signedAt, signature_payload: signaturePayload },
