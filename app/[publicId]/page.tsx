@@ -471,7 +471,6 @@ export default async function QuotePage({
                               productSortOrder={p.sort_order}
                               initialStatus={p.approval_status}
                               mainColor={template?.main_color}
-                              locked={isSigned}
                             />
                           </div>
                           <div
@@ -498,7 +497,6 @@ export default async function QuotePage({
                                 productSortOrder={p.sort_order}
                                 initialStatus={p.approval_status}
                                 mainColor={template?.main_color}
-                                locked={isSigned}
                               />
                             </div>
                           </div>

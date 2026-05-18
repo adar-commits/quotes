@@ -18,7 +18,7 @@ type Props = {
   productSortOrder: number;
   initialStatus?: string | null;
   mainColor?: string | null;
-  /** When true (quote signed), show status only — no edits */
+  /** When true, show status only — no edits (optional; not used on public quote view). */
   locked?: boolean;
 };
 
@@ -65,23 +65,23 @@ export default function ApprovalStatusSelect({
 
   const handleSelect = async (value: StatusValue) => {
     if (locked) return;
+    const previous = selected;
     setSelected(value);
     setOpen(false);
-    if (value !== "approved") return;
 
     setSaving(true);
     try {
       const res = await fetch(`/api/quotes/${quotePublicId}/approval`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productSortOrder, status: "approved" }),
+        body: JSON.stringify({ productSortOrder, status: value }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         throw new Error(data.error ?? "Save failed");
       }
     } catch (e) {
-      setSelected(null);
+      setSelected(previous);
       console.error(e);
     } finally {
       setSaving(false);
