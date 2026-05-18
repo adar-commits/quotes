@@ -215,18 +215,24 @@ export async function POST(request: NextRequest) {
     customer_id,
     customer_name,
     customer_address,
+    customer_email,
+    customer_phone,
   } = extractQuotationCustomerFields(root);
 
   if (
     customer_id ||
     customer_name ||
-    customer_address != null
+    customer_address != null ||
+    customer_email ||
+    customer_phone
   ) {
     const { error: custErr } = await supabase.from("quote_customers").insert({
       quote_id: quoteId,
       customer_id: customer_id ?? null,
       customer_name: customer_name ?? null,
       customer_address: customer_address,
+      customer_email: customer_email ?? null,
+      customer_phone: customer_phone ?? null,
     });
     if (custErr) {
       console.error("quote_customers insert:", custErr);

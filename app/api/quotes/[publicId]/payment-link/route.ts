@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { parseClientSignaturePayload } from "@/lib/client-signature";
+import { calculateQuoteBreakdown } from "@/lib/quote-total";
 import { loadQuoteWebhookEnrichment } from "@/lib/quote-webhook-enrichment";
 import { getQuoteWebhookUrl } from "@/lib/quote-webhook";
 import { createServiceRoleClient } from "@/lib/supabase-server";
@@ -61,12 +62,32 @@ export async function POST(
   const signature =
     parseClientSignaturePayload(row.signature_payload) ?? {};
 
+  const qTotals = quote as {
+    vat: number;
+    special_discount: number;
+  };
+  const { total: totalCharge } = calculateQuoteBreakdown({
+    vat: Number(qTotals.vat),
+    specialDiscount: Number(qTotals.special_discount),
+    lines: products.map((p) => ({
+      qty: p.qty,
+      unitPrice: Number(p.unit_price),
+      unitDiscount: Number(p.unit_discount),
+    })),
+  });
+
+  const customerEmail = customer?.customer_email ?? null;
+  const customerPhone = customer?.customer_phone ?? null;
+
   const payload = {
     eventType: "generatePaymentLink" as const,
     generatePaymentLink: true,
     paymentLink: true,
     isSigned: true,
     status: "Signed",
+    customerEmail,
+    customerPhone,
+    totalCharge,
     quote,
     customer,
     representative,

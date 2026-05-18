@@ -31,7 +31,9 @@ export async function loadQuoteWebhookEnrichment(
   const [customerRes, repRes, productsRes, termsRes] = await Promise.all([
     supabase
       .from("quote_customers")
-      .select("customer_id, customer_name, customer_address, customer_logo")
+      .select(
+        "customer_id, customer_name, customer_address, customer_logo, customer_email, customer_phone"
+      )
       .eq("quote_id", quoteId)
       .maybeSingle(),
     supabase

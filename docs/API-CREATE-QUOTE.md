@@ -12,6 +12,7 @@
 Send a **single quote object** or an **array with one quote object**. Fields map to your reference JSON.
 
 - **`specialDiscount`** – percentage (0–100) applied to the **line subtotal** (sum of all product lines) before VAT. Example: `10` means 10% off the subtotal. Omit or use `0` for no quote-level discount.
+- **Customer contact for payment link** – optional `customerEmail` and `customerPhone` inside the `customer` object (or at the root with the same names / `email`, `phone`, `mobile`, etc.). They are saved on `quote_customers` and sent on the **`generatePaymentLink`** webhook as top-level `customerEmail`, `customerPhone`, and **`totalCharge`** (final amount including VAT, same rules as the quote page).
 
 ### Minimal example
 

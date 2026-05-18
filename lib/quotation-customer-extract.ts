@@ -53,6 +53,8 @@ export function extractQuotationCustomerFields(raw: Record<string, unknown>): {
   customer_id: string | null;
   customer_name: string | null;
   customer_address: string | null;
+  customer_email: string | null;
+  customer_phone: string | null;
 } {
   const rawNorm = normalizeCustomerPayload(raw);
   const nested = mergeCustomerNestedObjects(rawNorm);
@@ -106,9 +108,43 @@ export function extractQuotationCustomerFields(raw: Record<string, unknown>): {
       ? null
       : String(addressCandidate);
 
+  const customer_email = firstNonEmptyString(
+    nested.customerEmail,
+    nested.customer_email,
+    nested.CustomerEmail,
+    nested.email,
+    nested.Email,
+    rawNorm.customerEmail,
+    rawNorm.customer_email,
+    rawNorm.CustomerEmail,
+    rawNorm.email,
+    rawNorm.Email
+  );
+
+  const customer_phone = firstNonEmptyString(
+    nested.customerPhone,
+    nested.customer_phone,
+    nested.CustomerPhone,
+    nested.phone,
+    nested.Phone,
+    nested.mobile,
+    nested.Mobile,
+    nested.tel,
+    nested.Tel,
+    rawNorm.customerPhone,
+    rawNorm.customer_phone,
+    rawNorm.CustomerPhone,
+    rawNorm.phone,
+    rawNorm.Phone,
+    rawNorm.mobile,
+    rawNorm.Mobile
+  );
+
   return {
     customer_id,
     customer_name,
     customer_address,
+    customer_email,
+    customer_phone,
   };
 }

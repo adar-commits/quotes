@@ -4,6 +4,8 @@ type QuotationPayloadCore = {
     customerID: string;
     customerName: string;
     customerAddress: string;
+    customerEmail?: string | null;
+    customerPhone?: string | null;
   };
   products: Array<{
     Qty: number;
@@ -51,4 +53,6 @@ export type QuotationPayload = QuotationPayloadCore & {
   customerID?: string;
   customerName?: string;
   customerAddress?: string;
+  customerEmail?: string | null;
+  customerPhone?: string | null;
 };
