@@ -19,7 +19,12 @@ export const metadata: Metadata = {
   title: { default: "הצעות מחיר", template: "%s" },
   description: "צפייה, אישור והערכה של הצעות מחיר",
   icons: {
-    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+    // Raster first: WhatsApp / FB crawlers often ignore SVG and fall back to a generic host icon.
+    icon: [
+      { url: "/hom-icon.jpg", sizes: "192x192", type: "image/jpeg" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+    apple: [{ url: "/hom-icon.jpg", sizes: "192x192", type: "image/jpeg" }],
   },
   openGraph: {
     type: "website",
@@ -27,6 +32,7 @@ export const metadata: Metadata = {
     siteName: "הצעות מחיר",
     title: "הצעות מחיר",
     description: "צפייה, אישור והערכה של הצעות מחיר",
+    images: [{ url: "/hom-icon.jpg", width: 192, height: 192, alt: "קבוצת HoM" }],
   },
 };
 
