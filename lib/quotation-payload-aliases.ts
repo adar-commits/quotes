@@ -147,7 +147,12 @@ export function requireSignatureBool(raw: Record<string, unknown>): boolean {
 
 /** Credit-card payment link on signed quotes; default false unless explicitly true. */
 export function payableBool(raw: Record<string, unknown>): boolean {
-  const v = raw.payable ?? raw.Payable;
+  const v =
+    raw.payable ??
+    raw.Payable ??
+    raw.paymentLink ??
+    raw.payment_link ??
+    raw.PaymentLink;
   if (v === true) return true;
   if (typeof v === "string") {
     const t = v.trim().toLowerCase();

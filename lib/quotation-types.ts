@@ -36,8 +36,10 @@ type QuotationPayloadCore = {
   };
   specialDiscount: number;
   requireSignature: boolean;
-  /** When true, customer may request a credit-card payment link after signing. Default false. */
+  /** When true, customer may request a credit-card payment link after signing. Default false. Same as root `paymentLink`. */
   payable?: boolean;
+  /** Alias for `payable` (CRM); both map to `quotes.payable`. */
+  paymentLink?: boolean;
   invoiceCreationDate: string;
   /** Use `template_id` for the row UUID, or `template_key` for the slug (redcarpet | pozitive | elite_rugs). A UUID may also be sent as `template_key` and will resolve by id. */
   template_id?: string | null;

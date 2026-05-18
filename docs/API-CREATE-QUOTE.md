@@ -133,6 +133,6 @@ curl -X POST "https://csquotes.vercel.app/api/quotes" \
 
 ## Notes
 
-- **`payable`** – optional boolean, default `false`. When `true`, after the customer signs the quote they can tap **צור לינק לתשלום באשראי** on the public page; the app asks your webhook for a URL and redirects the browser there.
+- **`payable`** (or **`paymentLink`**) – optional boolean, default `false`. When `true`, after the customer signs the quote they can tap **צור לינק לתשלום באשראי** on the public page; the app asks your webhook for a URL and redirects the browser there. Both names are stored as `quotes.payable`.
 - `public_id` is auto-generated (22-char hex) and used in the public quote URL.
 - No auth header required for this endpoint; protect it in production (e.g. API key or server-only) if needed.
