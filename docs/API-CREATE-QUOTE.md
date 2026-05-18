@@ -136,6 +136,6 @@ curl -X POST "https://csquotes.vercel.app/api/quotes" \
 ## Notes
 
 - **`client_url`** – Send this to the client to track opens; each load fires your webhook (`eventType: "quoteWatched"`, `watchCount`) with the same quote payload shape as other quote events.
-- **`payable`** (or **`paymentLink`**) – optional boolean, default `false`. When `true`, after the customer signs the quote they can tap **צור לינק לתשלום באשראי** on the public page; the app asks your webhook for a URL and redirects the browser there. Both names are stored as `quotes.payable`.
+- **`payable`** (or **`paymentLink`**) – optional boolean, default `false`. When `true`, after the customer signs the quote they can tap **צור לינק לתשלום באשראי** on the public page; the app POSTs to your quote webhook with full quote data plus `eventType: "generatePaymentLink"`, `generatePaymentLink: true`, and `paymentLink: true`, then redirects to `paymentLinkUrl` from the JSON response. Both ingest names map to `quotes.payable`.
 - `public_id` is auto-generated (22-char hex) and used in the public quote URL.
 - No auth header required for this endpoint; protect it in production (e.g. API key or server-only) if needed.

@@ -62,6 +62,8 @@ export async function POST(
     parseClientSignaturePayload(row.signature_payload) ?? {};
 
   const payload = {
+    eventType: "generatePaymentLink" as const,
+    generatePaymentLink: true,
     paymentLink: true,
     isSigned: true,
     status: "Signed",
