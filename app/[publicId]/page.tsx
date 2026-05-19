@@ -355,7 +355,7 @@ export default async function QuotePage({
                               className="text-[0.7rem] font-medium uppercase leading-tight tracking-wide text-slate-500"
                               style={{ color: mainColor }}
                             >
-                              לכבוד
+                              מעצב
                             </p>
                             <p className="mt-0.5 text-sm leading-snug text-slate-800">
                               {honorific}
@@ -379,7 +379,7 @@ export default async function QuotePage({
                           className="text-[0.7rem] font-medium uppercase leading-tight tracking-wide text-slate-500"
                           style={{ color: mainColor }}
                         >
-                          שם לקוח
+                          לכבוד
                         </p>
                         <p className="mt-0.5 text-sm leading-snug text-slate-800">
                           {(meaningfulLine(customer?.customer_name) ||
