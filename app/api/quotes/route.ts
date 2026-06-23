@@ -265,7 +265,7 @@ export async function POST(request: NextRequest) {
 
   const products = productsArray(root) as QuotationPayload["products"];
   if (products.length > 0) {
-    await supabase.from("quote_products").insert(
+    const { error: productsErr } = await supabase.from("quote_products").insert(
       products.map((p, i) => ({
         quote_id: quoteId,
         sort_order: i,
@@ -282,17 +282,31 @@ export async function POST(request: NextRequest) {
         additional_desc: p.additionalDesc ?? null,
       }))
     );
+    if (productsErr) {
+      console.error("quote_products insert:", productsErr);
+      return NextResponse.json(
+        { error: productsErr.message ?? "Failed to save products" },
+        { status: 500 }
+      );
+    }
   }
 
   const terms = paymentsTermsArray(root) as string[];
   if (terms.length > 0) {
-    await supabase.from("quote_payment_terms").insert(
+    const { error: termsErr } = await supabase.from("quote_payment_terms").insert(
       terms.map((term, i) => ({
         quote_id: quoteId,
         sort_order: i,
         term: String(term),
       }))
     );
+    if (termsErr) {
+      console.error("quote_payment_terms insert:", termsErr);
+      return NextResponse.json(
+        { error: termsErr.message ?? "Failed to save payment terms" },
+        { status: 500 }
+      );
+    }
   }
 
   const baseUrl = resolvePublicAppBase(request);
